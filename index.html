@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module Thông báo · CMS Cổng Pháp luật Quốc gia</title>
+<style>
+  :root{
+    --bg:#f5f7fb; --surface:#ffffff; --surface-2:#f8fafc; --surface-3:#eef2f8;
+    --border:#e5e9f1; --border-strong:#cfd6e2;
+    --text:#1b2333; --text-2:#4a5568; --muted:#7a879c;
+    --accent:#6644ff; --accent-600:#5836e6; --accent-50:#efeaff;
+    --success:#0f9d6e; --success-bg:#e4f6ef; --warning:#c47f00; --warning-bg:#fbf1de;
+    --danger:#e5484d; --danger-bg:#fceaea; --info:#2f6fed; --info-bg:#e8f0fe;
+    --sidebar:#0e1a2f; --sidebar-line:rgba(255,255,255,.07); --sidebar-txt:#c3cddd; --sidebar-dim:#6b7a93;
+    --shadow-sm:0 1px 2px rgba(15,23,42,.06); --shadow:0 6px 24px rgba(15,23,42,.10);
+    --r:7px; --r-lg:11px;
+    --mono:ui-monospace,"Cascadia Code","SF Mono",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#0d1117; --surface:#161c27; --surface-2:#1b2230; --surface-3:#222b3b;
+      --border:#28313f; --border-strong:#3a4556;
+      --text:#e7ecf5; --text-2:#aeb9cb; --muted:#7d8aa1;
+      --accent:#8b6dff; --accent-600:#9a80ff; --accent-50:#241f3b;
+      --success:#2bbd88; --success-bg:#14312a; --warning:#e0a020; --warning-bg:#3a2e12;
+      --danger:#f2686c; --danger-bg:#3a1f22; --info:#5b8cf5; --info-bg:#16233f;
+      --sidebar:#0a121f; --sidebar-line:rgba(255,255,255,.06);
+      --shadow:0 6px 24px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0d1117; --surface:#161c27; --surface-2:#1b2230; --surface-3:#222b3b;
+    --border:#28313f; --border-strong:#3a4556;
+    --text:#e7ecf5; --text-2:#aeb9cb; --muted:#7d8aa1;
+    --accent:#8b6dff; --accent-600:#9a80ff; --accent-50:#241f3b;
+    --success:#2bbd88; --success-bg:#14312a; --warning:#e0a020; --warning-bg:#3a2e12;
+    --danger:#f2686c; --danger-bg:#3a1f22; --info:#5b8cf5; --info-bg:#16233f;
+    --sidebar:#0a121f; --shadow:0 6px 24px rgba(0,0,0,.4);
+  }
+  :root[data-theme="light"]{
+    --bg:#f5f7fb; --surface:#ffffff; --surface-2:#f8fafc; --surface-3:#eef2f8;
+    --border:#e5e9f1; --border-strong:#cfd6e2;
+    --text:#1b2333; --text-2:#4a5568; --muted:#7a879c;
+    --accent:#6644ff; --accent-600:#5836e6; --accent-50:#efeaff;
+    --success:#0f9d6e; --success-bg:#e4f6ef; --warning:#c47f00; --warning-bg:#fbf1de;
+    --danger:#e5484d; --danger-bg:#fceaea; --info:#2f6fed; --info-bg:#e8f0fe;
+    --sidebar:#0e1a2f;
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--sans);font-size:14px;line-height:1.5;color:var(--text);background:var(--bg)}
+  button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+  a{color:inherit}
+  .num{font-variant-numeric:tabular-nums}
+  .mono{font-family:var(--mono)}
+
+  .app{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
+
+  /* Sidebar */
+  .side{background:var(--sidebar);color:var(--sidebar-txt);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+  .brand{display:flex;gap:11px;align-items:center;padding:16px 16px;border-bottom:1px solid var(--sidebar-line)}
+  .brand-mark{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,#6644ff,#b794ff);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;flex-shrink:0}
+  .brand-t{font-weight:600;color:#fff;font-size:13px;line-height:1.25}
+  .brand-s{font-size:11px;color:var(--sidebar-dim)}
+  .nav{padding:12px 8px;flex:1;overflow-y:auto}
+  .nav-h{font-size:10.5px;letter-spacing:.7px;text-transform:uppercase;color:var(--sidebar-dim);padding:14px 10px 6px}
+  .nav-i{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r);color:var(--sidebar-txt);font-size:13px;cursor:pointer;margin-bottom:1px;border:0;background:none;width:100%;text-align:left}
+  .nav-i:hover{background:rgba(255,255,255,.05);color:#fff}
+  .nav-i.on{background:rgba(102,68,255,.18);color:#c9b6ff}
+  .nav-i .ic{width:18px;text-align:center;font-size:15px}
+  .nav-i .bdg{margin-left:auto;font-size:10px;font-weight:600;padding:1px 6px;border-radius:9px;background:var(--danger);color:#fff}
+  .nav-i .warn{margin-left:auto;font-size:12px}
+  .side-f{padding:12px;border-top:1px solid var(--sidebar-line);display:flex;align-items:center;gap:10px}
+  .ava{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#e5484d);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600}
+  .side-f b{font-size:12px;color:#fff;font-weight:600;display:block}
+  .side-f span{font-size:11px;color:var(--sidebar-dim)}
+
+  /* Main */
+  .main{display:flex;flex-direction:column;min-width:0}
+  .top{position:sticky;top:0;z-index:6;background:var(--surface);border-bottom:1px solid var(--border);padding:11px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .crumb{font-size:13px;color:var(--muted);display:flex;gap:7px;align-items:center}
+  .crumb b{color:var(--text);font-weight:600}
+  .crumb .sep{color:var(--border-strong)}
+  .top-r{display:flex;gap:8px;align-items:center}
+  .icon-btn{width:34px;height:34px;border:1px solid var(--border);background:var(--surface);border-radius:var(--r);cursor:pointer;color:var(--text-2)}
+  .icon-btn:hover{background:var(--surface-2)}
+
+  .page{padding:22px 24px;max-width:1320px}
+  .ph{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+  h1.pt{margin:0 0 5px;font-size:22px;font-weight:650;text-wrap:balance;letter-spacing:-.2px}
+  .ps{margin:0;color:var(--muted);font-size:13px}
+  .acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+  .btn{height:34px;padding:0 14px;border-radius:var(--r);border:1px solid transparent;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-weight:550;font-size:13px;white-space:nowrap}
+  .btn-p{background:var(--accent);color:#fff}
+  .btn-p:hover{background:var(--accent-600)}
+  .btn-s{background:var(--surface);color:var(--text);border-color:var(--border-strong)}
+  .btn-s:hover{background:var(--surface-2)}
+  .btn-g{background:transparent;color:var(--text-2);border-color:var(--border)}
+  .btn-g:hover{background:var(--surface-2)}
+  .btn-sm{height:29px;padding:0 10px;font-size:12px}
+
+  /* KPI */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:18px}
+  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:15px 16px;box-shadow:var(--shadow-sm)}
+  .kpi .l{color:var(--muted);font-size:12px;margin-bottom:7px;display:flex;align-items:center;gap:6px}
+  .kpi .v{font-size:25px;font-weight:650;letter-spacing:-.5px}
+  .kpi .d{font-size:12px;margin-top:5px;color:var(--muted)}
+  .kpi .d.up{color:var(--success)} .kpi .d.dn{color:var(--danger)}
+  .spark{height:34px;margin-top:10px;display:flex;align-items:flex-end;gap:3px}
+  .spark i{flex:1;background:var(--accent-50);border-radius:2px 2px 0 0;min-height:3px}
+  .spark i.hl{background:var(--accent)}
+
+  /* toolbar */
+  .tb{display:flex;justify-content:space-between;gap:12px;margin-bottom:13px;flex-wrap:wrap;align-items:center}
+  .tb-l{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .search{position:relative}
+  .search input{width:250px;max-width:60vw;padding:8px 10px 8px 30px;border:1px solid var(--border);border-radius:var(--r);background:var(--surface)}
+  .search::before{content:"🔍";position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:12px;opacity:.6}
+  .sel{height:34px;padding:0 30px 0 11px;border:1px solid var(--border);border-radius:var(--r);background:var(--surface);cursor:pointer;-webkit-appearance:none;appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a879c' stroke-width='2.5' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center}
+  input:focus,.sel:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-50)}
+  .count{font-size:12px;color:var(--muted)}
+
+  /* table */
+  .tw{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-sm)}
+  .tscroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:640px}
+  th{background:var(--surface-2);text-align:left;font-size:11.5px;font-weight:600;color:var(--muted);padding:10px 13px;border-bottom:1px solid var(--border);white-space:nowrap;text-transform:uppercase;letter-spacing:.3px}
+  td{padding:11px 13px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+  tbody tr:last-child td{border-bottom:0}
+  tbody tr:hover{background:var(--surface-2)}
+  .t-title{font-weight:550}
+  .t-sub{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .r-acts{display:flex;gap:3px}
+  .r-acts button{width:27px;height:27px;border:0;background:none;border-radius:5px;cursor:pointer;color:var(--muted);font-size:13px}
+  .r-acts button:hover{background:var(--surface-3);color:var(--text)}
+
+  /* chips + status */
+  .chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:550;white-space:nowrap}
+  .c-inapp{background:var(--info-bg);color:var(--info)}
+  .c-email{background:var(--success-bg);color:var(--success)}
+  .c-push{background:var(--warning-bg);color:var(--warning)}
+  .c-sms{background:var(--accent-50);color:var(--accent)}
+  .c-zalo{background:#e8f0fe;color:#2f6fed}
+  .c-gray{background:var(--surface-3);color:var(--text-2)}
+  .st{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:550;white-space:nowrap}
+  .st::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--muted)}
+  .st.ok::before{background:var(--success)} .st.warn::before{background:var(--warning)}
+  .st.err::before{background:var(--danger)} .st.mut::before{background:var(--muted)}
+  .st.info::before{background:var(--info)}
+
+  /* bars */
+  .bar{height:7px;background:var(--surface-3);border-radius:4px;overflow:hidden;min-width:80px}
+  .bar>i{display:block;height:100%;background:var(--accent);border-radius:4px}
+  .bar>i.g{background:var(--success)} .bar>i.w{background:var(--warning)} .bar>i.r{background:var(--danger)}
+  .prog{display:flex;align-items:center;gap:8px}
+  .prog .pc{font-size:11px;color:var(--muted);min-width:34px;text-align:right}
+
+  /* panels */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);margin-bottom:14px}
+  .panel-h{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+  .panel-h h3{margin:0;font-size:14px;font-weight:600}
+  .panel-b{padding:16px}
+
+  /* callout */
+  .callout{border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 16px;display:flex;gap:12px;margin-bottom:18px;background:var(--surface)}
+  .callout.warn{background:var(--warning-bg);border-color:transparent}
+  .callout .ci{font-size:18px}
+  .callout h4{margin:0 0 4px;font-size:13.5px}
+  .callout ul{margin:6px 0 0;padding-left:18px;font-size:12.5px;color:var(--text-2)}
+  .callout li{margin-bottom:3px}
+
+  /* chart */
+  .chart{padding:16px;display:flex;align-items:flex-end;gap:5px;height:210px}
+  .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+  .col .b{width:66%;background:var(--accent);border-radius:3px 3px 0 0;position:relative;transition:.2s}
+  .col .b:hover{background:var(--accent-600)}
+  .col .b::after{content:attr(data-v);position:absolute;top:-19px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--muted);opacity:0;white-space:nowrap}
+  .col .b:hover::after{opacity:1}
+  .col .x{font-size:10px;color:var(--muted)}
+  .donut-wrap{display:flex;align-items:center;gap:24px;padding:22px;flex-wrap:wrap;justify-content:center}
+  .donut{width:158px;height:158px;border-radius:50%;position:relative;flex-shrink:0}
+  .donut::after{content:"";position:absolute;inset:26px;background:var(--surface);border-radius:50%}
+  .legend{font-size:12.5px;display:flex;flex-direction:column;gap:7px}
+  .legend div{display:flex;align-items:center;gap:8px}
+  .legend .dot{width:10px;height:10px;border-radius:3px}
+
+  /* config cards */
+  .cfg-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .cfg{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow-sm);position:relative}
+  .cfg-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+  .cfg-ic{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:21px;background:var(--surface-3);flex-shrink:0}
+  .cfg h3{margin:0;font-size:15px}
+  .cfg .prov{font-size:12px;color:var(--muted);margin-top:2px}
+  .cfg-meta{display:flex;flex-direction:column;gap:7px;font-size:12.5px;border-top:1px solid var(--border);padding-top:12px;margin-top:4px}
+  .cfg-meta .row{display:flex;justify-content:space-between;gap:10px}
+  .cfg-meta .row span:first-child{color:var(--muted)}
+  .cfg-badge{position:absolute;top:16px;right:16px}
+
+  /* form */
+  .form{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+  .fr{display:flex;flex-direction:column;gap:6px;font-size:13px}
+  .fr.full{grid-column:1/-1}
+  .fr>label{color:var(--text-2);font-weight:550;font-size:12.5px}
+  .fr .hint{color:var(--muted);font-weight:400;font-size:11px}
+  .inp{padding:8px 10px;border:1px solid var(--border);border-radius:var(--r);background:var(--surface);width:100%}
+  textarea.inp{font-family:var(--mono);font-size:12px;resize:vertical}
+  .checks{display:flex;gap:16px;flex-wrap:wrap}
+  .ck{display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer}
+  .seg{display:inline-flex;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+  .seg button{border:0;background:var(--surface);padding:7px 13px;font-size:12.5px;cursor:pointer;color:var(--text-2)}
+  .seg button.on{background:var(--accent);color:#fff}
+
+  .view{display:none} .view.on{display:block}
+  .tag{font-family:var(--mono);font-size:11px;background:var(--accent-50);color:var(--accent);padding:1px 6px;border-radius:4px;font-weight:600}
+
+  @media (max-width:1080px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2,.cfg-grid,.form{grid-template-columns:1fr}}
+  @media (max-width:760px){.app{grid-template-columns:1fr}.side{display:none}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+  /* modal */
+  .modal-bg{position:fixed;inset:0;background:rgba(10,15,25,.55);display:none;align-items:center;justify-content:center;z-index:50;padding:22px}
+  .modal-bg.on{display:flex}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);width:100%;max-width:660px;max-height:90vh;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+  .modal-h{display:flex;justify-content:space-between;align-items:center;padding:15px 18px;border-bottom:1px solid var(--border)}
+  .modal-h h3{margin:0;font-size:16px}
+  .modal-x{border:0;background:none;font-size:18px;cursor:pointer;color:var(--muted);line-height:1}
+  .modal-b{padding:18px;overflow-y:auto}
+  .modal-f{padding:13px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+  .ev-list{border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;max-height:210px;overflow-y:auto;background:var(--surface-2)}
+  .ev-g{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin:9px 0 3px}
+  .ev-g:first-child{margin-top:0}
+  .ev-i{display:flex;align-items:center;gap:8px;padding:4px 2px;font-size:13px;cursor:pointer}
+  .ev-i .code{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="side">
+    <div class="brand">
+      <div class="brand-mark">PL</div>
+      <div><div class="brand-t">Pháp luật Quốc gia</div><div class="brand-s">CMS · Quản trị</div></div>
+    </div>
+    <nav class="nav" id="nav">
+      <div class="nav-h">Quản trị thông báo</div>
+      <button class="nav-i on" data-view="list"><span class="ic">📋</span> Danh sách thông báo <span class="bdg">18</span></button>
+      <button class="nav-i" data-view="compose"><span class="ic">✉️</span> Tạo &amp; gửi</button>
+      <button class="nav-i" data-view="types"><span class="ic">🏷️</span> Loại thông báo</button>
+      <button class="nav-i" data-view="templates"><span class="ic">📝</span> Mẫu thông báo</button>
+      <button class="nav-i" data-view="groups"><span class="ic">👥</span> Nhóm &amp; đối tượng</button>
+      <div class="nav-h">Kênh gửi</div>
+      <button class="nav-i" data-view="channels"><span class="ic">⚙️</span> Cấu hình gửi</button>
+      <button class="nav-i" data-view="devices"><span class="ic">📱</span> Thiết bị (Push)</button>
+      <div class="nav-h">Giám sát</div>
+      <button class="nav-i" data-view="delivery"><span class="ic">📶</span> Trạng thái gửi</button>
+      <button class="nav-i" data-view="receipts"><span class="ic">📬</span> Lịch sử nhận</button>
+      <button class="nav-i" data-view="stats"><span class="ic">📈</span> Thống kê</button>
+    </nav>
+    <div class="side-f">
+      <div class="ava">TA</div>
+      <div><b>taind39</b><span>Quản trị viên</span></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <header class="top">
+      <div class="crumb"><span>CMS</span><span class="sep">/</span><span>Thông báo</span><span class="sep">/</span><b id="crumb">Danh sách thông báo</b></div>
+      <div class="top-r">
+        <button class="icon-btn" id="theme" title="Đổi giao diện sáng/tối">◑</button>
+        <button class="icon-btn" title="Trợ giúp">?</button>
+      </div>
+    </header>
+
+    <!-- VIEW: LIST -->
+    <section class="view on page" id="v-list">
+      <div class="ph">
+        <div><h1 class="pt">Danh sách thông báo</h1><p class="ps">Tạo, lập lịch và theo dõi thông báo gửi tới người dùng Cổng Pháp luật Quốc gia</p></div>
+        <div class="acts">
+          <button class="btn btn-g">⬇ Xuất Excel</button>
+          <button class="btn btn-s" data-go="compose">📤 Gửi hàng loạt</button>
+          <button class="btn btn-p" data-go="compose">+ Tạo thông báo</button>
+        </div>
+      </div>
+      <div class="kpis" id="k-list"></div>
+      <div class="tb">
+        <div class="tb-l">
+          <div class="search"><input placeholder="Tìm theo tiêu đề…"></div>
+          <select class="sel"><option>Tất cả loại</option><option>Văn bản</option><option>Dự thảo</option><option>Hỏi đáp</option><option>Phản ánh</option><option>Hệ thống</option></select>
+          <select class="sel"><option>Mọi trạng thái</option><option>Đã gửi</option><option>Đang gửi</option><option>Lên lịch</option><option>Nháp</option><option>Lỗi</option></select>
+          <select class="sel"><option>Mọi kênh</option><option>In-app</option><option>Email</option><option>Push</option><option>SMS</option></select>
+        </div>
+        <span class="count" id="c-list"></span>
+      </div>
+      <div class="tw"><div class="tscroll"><table>
+        <thead><tr><th>Tiêu đề</th><th>Loại</th><th>Kênh</th><th>Phát hành</th><th>Đối tượng</th><th>Đã gửi</th><th>Mở / Nhấp</th><th>Trạng thái</th><th></th></tr></thead>
+        <tbody id="tb-list"></tbody>
+      </table></div></div>
+    </section>
+
+    <!-- VIEW: COMPOSE -->
+    <section class="view page" id="v-compose">
+      <div class="ph"><div><h1 class="pt">Tạo &amp; gửi thông báo</h1><p class="ps">Thủ công · theo lịch · theo sự kiện nghiệp vụ — gửi theo nhóm, hồ sơ và hành vi</p></div></div>
+      <div class="grid2">
+        <div>
+          <div class="panel"><div class="panel-h"><h3>Nội dung</h3><span class="tag">notifications</span></div><div class="panel-b">
+            <div class="form">
+              <div class="fr full"><label id="c-template-l">Mẫu áp dụng</label><select class="sel" id="c-template"><option>— Không dùng mẫu —</option><option>TPL-VB-001 · Văn bản mới ban hành</option><option>TPL-DD-001 · Dự thảo mới lấy ý kiến</option></select></div>
+              <div class="fr"><label>Loại thông báo *</label><select class="sel"><option>legal_document · Văn bản</option><option>draft_document · Dự thảo</option><option>qa_answer · Hỏi đáp</option><option>petition_update · Phản ánh</option><option>system · Hệ thống</option></select></div>
+              <div class="fr"><label>Mức ưu tiên</label><select class="sel"><option>Bình thường</option><option>Quan trọng</option><option>Khẩn</option></select></div>
+              <div class="fr full"><label id="c-title-l">Tiêu đề *</label><input class="inp" id="c-title" value="Văn bản mới: Nghị định 280/2026/NĐ-CP về Bảo hiểm Tiền gửi"></div>
+              <div class="fr full"><label>Nội dung * <span class="hint">(biến: {{user.full_name}}, {{document.title}}…)</span></label><textarea class="inp" id="c-content" rows="4">Xin chào {{user.full_name}}, văn bản {{document.title}} vừa ban hành thuộc lĩnh vực {{document.field}}, hiệu lực từ {{document.effective_date}}.</textarea></div>
+              <div class="fr full"><label>Kênh gửi *</label><div class="checks">
+                <label class="ck"><input type="checkbox" checked> In-app</label>
+                <label class="ck"><input type="checkbox" checked> Email</label>
+                <label class="ck"><input type="checkbox"> Push</label>
+                <label class="ck"><input type="checkbox"> SMS</label>
+              </div></div>
+            </div>
+          </div></div>
+        </div>
+        <div>
+          <div class="panel"><div class="panel-h"><h3>Phát hành</h3><span class="tag">schedule_type</span></div><div class="panel-b">
+            <div class="seg" id="pubseg" style="margin-bottom:14px">
+              <button class="on" data-mode="now">Gửi ngay</button><button data-mode="sched">Lập lịch</button><button data-mode="event">Theo sự kiện</button>
+            </div>
+            <div class="form" id="pubfields"></div>
+          </div></div>
+          <div class="panel"><div class="panel-h"><h3>Đối tượng nhận</h3><span class="tag">recipients_config</span></div><div class="panel-b">
+            <div class="form" id="recipbox"></div>
+          </div></div>
+          <div class="acts" style="justify-content:flex-end">
+            <button class="btn btn-g">Lưu nháp</button>
+            <button class="btn btn-p" id="btn-pub-send">🚀 Gửi thông báo</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: TYPES -->
+    <section class="view page" id="v-types">
+      <div class="ph"><div><h1 class="pt">Loại thông báo</h1><p class="ps">Danh mục loại — nối <b>sự kiện</b> kỹ thuật với tuỳ chọn nhận của người dân</p></div><div class="acts"><button class="btn btn-p" id="btn-add-type">+ Thêm loại</button></div></div>
+      <div class="tb"><div class="tb-l"><div class="search"><input placeholder="Tìm loại…"></div><select class="sel"><option>Mọi kiểu gửi</option><option>Broadcast</option><option>Cá nhân</option></select></div><span class="count" id="c-types"></span></div>
+      <div class="tw"><div class="tscroll"><table>
+        <thead><tr><th>Mã</th><th>Tên loại</th><th>Sự kiện gộp</th><th>Kiểu gửi</th><th>Lĩnh vực</th><th>Người dân</th><th>Tần suất</th><th>Mẫu</th><th>Trạng thái</th><th></th></tr></thead>
+        <tbody id="tb-types"></tbody>
+      </table></div></div>
+    </section>
+
+    <!-- VIEW: TEMPLATES -->
+    <section class="view page" id="v-templates">
+      <div class="ph"><div><h1 class="pt">Mẫu thông báo</h1><p class="ps">Nội dung mẫu riêng cho từng kênh (In-app · Email · Push) kèm biến động &amp; phiên bản</p></div><div class="acts"><button class="btn btn-p">+ Tạo mẫu</button></div></div>
+      <div class="callout warn"><span class="ci">⚠️</span><div><h4>Hiện trạng UAT</h4>Chỉ có <b>2 mẫu</b> trên tổng <b>15 loại</b> thông báo — cần bổ sung mẫu cho các loại còn lại trước nghiệm thu.</div></div>
+      <div class="tw"><div class="tscroll"><table>
+        <thead><tr><th>Mã</th><th>Tên mẫu</th><th>Loại</th><th>Kênh có nội dung</th><th>Phiên bản</th><th>Trạng thái</th><th></th></tr></thead>
+        <tbody id="tb-templates"></tbody>
+      </table></div></div>
+    </section>
+
+    <!-- VIEW: GROUPS -->
+    <section class="view page" id="v-groups">
+      <div class="ph"><div><h1 class="pt">Nhóm &amp; đối tượng</h1><p class="ps">Phân khúc người nhận theo lĩnh vực, vai trò và hành vi để gửi hàng loạt</p></div><div class="acts"><button class="btn btn-p">+ Tạo nhóm</button></div></div>
+      <div class="callout"><span class="ci">💡</span><div><h4>Đề xuất bổ sung (từ phân tích UAT)</h4>Hiện <b>notification_group</b> mới là thư mục, chưa có bảng nhóm/segment thật &amp; targeting theo hành vi. Màn này là thiết kế đề xuất cho CMS-548.</div></div>
+      <div class="tw"><div class="tscroll"><table>
+        <thead><tr><th>Tên nhóm</th><th>Tiêu chí</th><th>Loại</th><th>Số người (ước tính)</th><th>Trạng thái</th><th></th></tr></thead>
+        <tbody id="tb-groups"></tbody>
+      </table></div></div>
+    </section>
+
+    <!-- VIEW: CHANNELS -->
+    <section class="view page" id="v-channels">
+      <div class="ph"><div><h1 class="pt">Cấu hình gửi</h1><p class="ps">Nhà cung cấp, người gửi &amp; giới hạn cho từng kênh — <span class="tag">notification_settings</span></p></div><div class="acts"><button class="btn btn-s">🧪 Kiểm tra kết nối</button><button class="btn btn-p">+ Thêm kênh</button></div></div>
+      <div class="cfg-grid" id="cfg-grid"></div>
+    </section>
+
+    <!-- VIEW: DEVICES -->
+    <section class="view page" id="v-devices">
+      <div class="ph"><div><h1 class="pt">Thiết bị nhận Push</h1><p class="ps">Token thiết bị đăng ký qua Mobile App — <span class="tag">user_devices</span></p></div></div>
+      <div class="kpis" id="k-dev"></div>
+      <div class="tw"><div class="tscroll"><table>
+        <thead><tr><th>Người dùng</th><th>Nền tảng</th><th>Thiết bị</th><th>Provider</th><th>Phiên bản</th><th>Hoạt động gần nhất</th><th>Trạng thái</th></tr></thead>
+        <tbody id="tb-dev"></tbody>
+      </table></div></div>
+    </section>
+
+    <!-- VIEW: DELIVERY -->
+    <section class="view page" id="v-delivery">
+      <div class="ph"><div><h1 class="pt">Trạng thái gửi</h1><p class="ps">Giám sát tiến độ &amp; kết quả gửi theo lô, trên mọi kênh — <span class="tag">notification_recipients</span></p></div><div class="acts"><button class="btn btn-g">🔄 Làm mới</button><button class="btn btn-g">⬇ CSV</button></div></div>
+      <div class="kpis" id="k-del"></div>
+      <div class="tb"><div class="tb-l"><div class="search"><input placeholder="Tìm theo tiêu đề…"></div><select class="sel"><option>Mọi kênh</option></select><select class="sel"><option>Mọi trạng thái</option></select></div><span class="count" id="c-del"></span></div>
+      <div class="tw"><div class="tscroll"><table>
+        <thead><tr><th>Thời gian</th><th>Thông báo</th><th>Kênh</th><th>Người nhận</th><th>Thành công</th><th>Thất bại</th><th>Tiến độ</th><th>Trạng thái</th></tr></thead>
+        <tbody id="tb-del"></tbody>
+      </table></div></div>
+    </section>
+
+    <!-- VIEW: RECEIPTS -->
+    <section class="view page" id="v-receipts">
+      <div class="ph"><div><h1 class="pt">Lịch sử nhận</h1><p class="ps">Toàn bộ lịch sử nhận của từng người dùng trên mọi kênh — <span class="tag">notification_recipients</span></p></div><div class="acts"><select class="sel" id="ru"></select></div></div>
+      <div class="kpis" id="k-rec"></div>
+      <div class="tw"><div class="tscroll"><table>
+        <thead><tr><th>Thời gian</th><th>Thông báo</th><th>In-app</th><th>Email</th><th>Push</th><th>Trạng thái</th></tr></thead>
+        <tbody id="tb-rec"></tbody>
+      </table></div></div>
+    </section>
+
+    <!-- VIEW: STATS -->
+    <section class="view page" id="v-stats">
+      <div class="ph"><div><h1 class="pt">Thống kê thông báo</h1><p class="ps">Số lượng gửi, tỷ lệ mở &amp; tỷ lệ nhấp theo thời gian và kênh</p></div><div class="acts"><select class="sel"><option>30 ngày qua</option><option>7 ngày qua</option></select><button class="btn btn-g">⬇ Báo cáo</button></div></div>
+      <div class="kpis" id="k-stats"></div>
+      <div class="grid2">
+        <div class="panel"><div class="panel-h"><h3>Số lượng gửi theo ngày</h3></div><div class="chart" id="chart"></div></div>
+        <div class="panel"><div class="panel-h"><h3>Phân bố theo loại</h3></div><div class="donut-wrap"><div class="donut" id="donut"></div><div class="legend" id="legend"></div></div></div>
+      </div>
+      <div class="panel"><div class="panel-h"><h3>Hiệu quả theo kênh</h3></div><div class="tscroll"><table>
+        <thead><tr><th>Kênh</th><th>Đã gửi</th><th>Đã mở</th><th>Tỷ lệ mở</th><th>Đã nhấp</th><th>CTR</th></tr></thead>
+        <tbody id="tb-stats"></tbody>
+      </table></div></div>
+    </section>
+  </main>
+</div>
+
+<!-- MODAL: Thêm/Sửa loại thông báo (CMS-544) -->
+<div class="modal-bg" id="type-modal">
+  <div class="modal">
+    <div class="modal-h"><h3 id="tm-title">Thêm loại thông báo</h3><button class="modal-x" data-tmclose>✕</button></div>
+    <div class="modal-b">
+      <div class="form">
+        <div class="fr"><label>Mã loại *</label><input class="inp mono" id="tm-code" placeholder="vd: legal_document"></div>
+        <div class="fr"><label>Trạng thái</label><select class="sel" id="tm-active"><option value="1">Đang dùng</option><option value="0">Tạm ẩn</option></select></div>
+        <div class="fr full"><label>Tên loại <span class="hint">(người dân nhìn thấy)</span> *</label><input class="inp" id="tm-name" placeholder="vd: Văn bản QPPL"></div>
+        <div class="fr full"><label>Mô tả</label><input class="inp" id="tm-desc"></div>
+        <div class="fr"><label>Kiểu gửi</label><div class="seg" id="tm-mode"><button class="on" data-v="broadcast">Broadcast</button><button data-v="personal">Cá nhân</button></div></div>
+        <div class="fr"><label>Tần suất mặc định</label><select class="sel" id="tm-freq"><option>Ngay</option><option>Hằng ngày</option><option>Hằng tuần</option></select></div>
+        <div class="fr"><label>Lọc theo lĩnh vực</label><label class="ck"><input type="checkbox" id="tm-field"> Cho người dân lọc lĩnh vực</label></div>
+        <div class="fr"><label>Người dân được tắt</label><div class="seg" id="tm-toggle"><button class="on" data-v="optional">Tuỳ chọn</button><button data-v="required">Bắt buộc</button></div></div>
+        <div class="fr full"><label>Sự kiện thuộc loại <span class="hint">(1 loại gồm nhiều sự kiện kích hoạt)</span></label><div class="ev-list" id="tm-events"></div></div>
+      </div>
+    </div>
+    <div class="modal-f"><button class="btn btn-g" data-tmclose>Huỷ</button><button class="btn btn-p" id="tm-save">💾 Lưu</button></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var vn = function(n){ return n.toLocaleString('vi-VN'); };
+  var CH = {'in_app':['In-app','c-inapp'],'email':['Email','c-email'],'push':['Push','c-push'],'sms':['SMS','c-sms'],'zalo':['Zalo','c-zalo']};
+  function chips(arr){ return arr.map(function(c){var m=CH[c]||['?','c-gray'];return '<span class="chip '+m[1]+'">'+m[0]+'</span>';}).join(' '); }
+  function el(id){ return document.getElementById(id); }
+
+  /* ---------- NAV ---------- */
+  var crumbMap={list:'Danh sách thông báo',compose:'Tạo & gửi',types:'Loại thông báo',templates:'Mẫu thông báo',groups:'Nhóm & đối tượng',channels:'Cấu hình gửi',devices:'Thiết bị (Push)',delivery:'Trạng thái gửi',receipts:'Lịch sử nhận',stats:'Thống kê'};
+  function go(v){
+    document.querySelectorAll('.view').forEach(function(s){s.classList.toggle('on',s.id==='v-'+v);});
+    document.querySelectorAll('.nav-i').forEach(function(b){b.classList.toggle('on',b.dataset.view===v);});
+    el('crumb').textContent=crumbMap[v]||v;
+    window.scrollTo(0,0);
+  }
+  document.getElementById('nav').addEventListener('click',function(e){var b=e.target.closest('.nav-i');if(b)go(b.dataset.view);});
+  document.body.addEventListener('click',function(e){var b=e.target.closest('[data-go]');if(b)go(b.dataset.go);});
+
+  /* theme toggle */
+  el('theme').addEventListener('click',function(){
+    var r=document.documentElement, cur=r.getAttribute('data-theme');
+    var next = cur==='dark'?'light': cur==='light'?'dark' : (matchMedia('(prefers-color-scheme:dark)').matches?'light':'dark');
+    r.setAttribute('data-theme',next);
+  });
+
+  function kpi(l,v,d,cls,spark){
+    var s = spark? '<div class="spark">'+spark.map(function(x,i){return '<i class="'+(i===spark.length-1?'hl':'')+'" style="height:'+Math.round(x/Math.max.apply(null,spark)*100)+'%"></i>';}).join('')+'</div>':'';
+    return '<div class="kpi"><div class="l">'+l+'</div><div class="v num">'+v+'</div>'+(d?'<div class="d '+(cls||'')+'">'+d+'</div>':'')+s+'</div>';
+  }
+
+  /* ---------- DATA (phản ánh mô hình thật; dữ liệu minh hoạ đã làm sạch) ---------- */
+  var notifs=[
+    {t:'Văn bản mới: Nghị định 280/2026/NĐ-CP về Bảo hiểm Tiền gửi',type:'Văn bản',ch:['in_app','email','push'],sc:'immediate',st:'ok',stl:'Đã gửi',rec:3240,sent:3240,op:2418,cl:1145,at:'13/07 09:15'},
+    {t:'Dự thảo Luật Đất đai sửa đổi — mời góp ý',type:'Dự thảo',ch:['in_app','email','push','sms'],sc:'immediate',st:'ok',stl:'Đã gửi',rec:12450,sent:12450,op:9230,cl:4120,at:'12/07 14:00'},
+    {t:'Câu hỏi #QA-2024-1876 đã có câu trả lời từ chuyên gia',type:'Hỏi đáp',ch:['in_app','email'],sc:'event',st:'ok',stl:'Đã gửi',rec:1,sent:1,op:1,cl:1,at:'12/07 11:23'},
+    {t:'Phản ánh #PA-00482 đã được xử lý',type:'Phản ánh',ch:['in_app','email'],sc:'event',st:'ok',stl:'Đã gửi',rec:1,sent:1,op:1,cl:1,at:'11/07 16:45'},
+    {t:'Khảo sát: Mức độ hài lòng dịch vụ công 2026',type:'Khảo sát',ch:['in_app','email'],sc:'scheduled',st:'warn',stl:'Lên lịch',rec:5000,sent:0,op:0,cl:0,at:'20/07 08:00'},
+    {t:'Bảo trì hệ thống 02:00–04:00 ngày 15/07',type:'Hệ thống',ch:['in_app','push','sms'],sc:'scheduled',st:'warn',stl:'Lên lịch',rec:12450,sent:0,op:0,cl:0,at:'14/07 18:00'},
+    {t:'Tin bài "Xây dựng Luật VBQPPL" đã được duyệt',type:'Tin bài',ch:['in_app','email'],sc:'event',st:'ok',stl:'Đã gửi',rec:1,sent:1,op:1,cl:0,at:'10/07 09:30'},
+    {t:'Nhắc lịch tư vấn với chuyên gia (16/07 14:00)',type:'Hỏi đáp',ch:['in_app','push','sms'],sc:'scheduled',st:'err',stl:'Lỗi',rec:1,sent:0,op:0,cl:0,at:'—'}
+  ];
+  function renderList(){
+    var tot=notifs.length, sentSum=notifs.reduce(function(s,n){return s+n.sent;},0);
+    var opSum=notifs.reduce(function(s,n){return s+n.op;},0), sentRec=notifs.filter(function(n){return n.sent>0;}).reduce(function(s,n){return s+n.sent;},0);
+    el('k-list').innerHTML=
+      kpi('Tổng thông báo','1.248','+12% so tháng trước','up',[42,58,67,51,89,102,124])+
+      kpi('Đã gửi hôm nay','87','+5%','up',[30,40,55,48,70,62,87])+
+      kpi('Tỷ lệ mở','68,4%','+2,1%','up')+
+      kpi('Tỷ lệ nhấp','32,7%','−0,8%','dn');
+    el('c-list').textContent=tot+' bản ghi (hiển thị mẫu)';
+    el('tb-list').innerHTML=notifs.map(function(n){
+      var op=n.sent?Math.round(n.op/n.sent*100):0, ctr=n.sent?Math.round(n.cl/n.sent*100):0;
+      var scMap={immediate:'Gửi ngay',scheduled:'Lên lịch',event:'Theo sự kiện'};
+      return '<tr><td><div class="t-title">'+n.t+'</div></td>'+
+        '<td><span class="chip c-gray">'+n.type+'</span></td>'+
+        '<td><div style="display:flex;gap:3px;flex-wrap:wrap">'+chips(n.ch)+'</div></td>'+
+        '<td>'+scMap[n.sc]+'</td>'+
+        '<td class="num">'+vn(n.rec)+'</td>'+
+        '<td class="num"><b>'+vn(n.sent)+'</b></td>'+
+        '<td><span class="mut num" style="font-size:11px;color:var(--muted)">'+op+'% / '+ctr+'%</span></td>'+
+        '<td><span class="st '+n.st+'">'+n.stl+'</span></td>'+
+        '<td><div class="r-acts"><button title="Xem">👁</button><button title="Nhân bản">⧉</button></div></td></tr>';
+    }).join('');
+  }
+
+  var EVENTS=[
+    {id:'document.created',label:'Văn bản mới ban hành',group:'Văn bản'},
+    {id:'document.effective_soon',label:'Sắp có hiệu lực',group:'Văn bản'},
+    {id:'document.expired',label:'Hết hiệu lực',group:'Văn bản'},
+    {id:'document.updated',label:'Được sửa đổi',group:'Văn bản'},
+    {id:'draft.created',label:'Dự thảo mới lấy ý kiến',group:'Dự thảo'},
+    {id:'draft.deadline_near',label:'Sắp hết hạn góp ý',group:'Dự thảo'},
+    {id:'draft.closed',label:'Kết thúc lấy ý kiến',group:'Dự thảo'},
+    {id:'question.answered',label:'Câu hỏi được trả lời',group:'Hỏi đáp'},
+    {id:'petition.resolved',label:'Phản ánh được xử lý',group:'Phản ánh'},
+    {id:'topic.replied',label:'Chủ đề có phản hồi',group:'Diễn đàn'},
+    {id:'survey.published',label:'Khảo sát mới',group:'Khảo sát'},
+    {id:'article.approved',label:'Tin bài được duyệt',group:'Tin bài'},
+    {id:'system.maintenance',label:'Bảo trì hệ thống',group:'Hệ thống'},
+    {id:'auth.new_device',label:'Đăng nhập thiết bị mới',group:'Bảo mật'}
+  ];
+  function evLabel(id){var e=EVENTS.filter(function(x){return x.id===id;})[0];return e?e.label:id;}
+
+  var types=[
+    {c:'legal_document',n:'Văn bản QPPL',d:'Văn bản quy phạm pháp luật',mode:'broadcast',field:true,toggle:'optional',freq:'Ngay',tpl:1,a:1,ev:['document.created','document.effective_soon','document.expired','document.updated']},
+    {c:'draft_document',n:'Dự thảo văn bản',d:'Dự thảo đang lấy ý kiến',mode:'broadcast',field:true,toggle:'optional',freq:'Ngay',tpl:1,a:1,ev:['draft.created','draft.deadline_near','draft.closed']},
+    {c:'qa_answer',n:'Hỏi đáp pháp luật',d:'Câu hỏi của người dân được trả lời',mode:'personal',field:false,toggle:'optional',freq:'Ngay',tpl:0,a:1,ev:['question.answered']},
+    {c:'petition_update',n:'Phản ánh – kiến nghị',d:'Cập nhật xử lý phản ánh',mode:'personal',field:false,toggle:'optional',freq:'Ngay',tpl:0,a:1,ev:['petition.resolved']},
+    {c:'forum_topic',n:'Diễn đàn chính sách',d:'Phản hồi trong chủ đề theo dõi',mode:'broadcast',field:true,toggle:'optional',freq:'Hằng ngày',tpl:0,a:1,ev:['topic.replied']},
+    {c:'survey',n:'Khảo sát',d:'Mời tham gia khảo sát',mode:'broadcast',field:false,toggle:'optional',freq:'Ngay',tpl:0,a:1,ev:['survey.published']},
+    {c:'content_contributor',n:'Duyệt tin bài (CTV)',d:'Kết quả duyệt tin bài cộng tác viên',mode:'personal',field:false,toggle:'optional',freq:'Ngay',tpl:0,a:1,ev:['article.approved']},
+    {c:'newsletter',n:'Bản tin định kỳ',d:'Tổng hợp theo lĩnh vực quan tâm',mode:'broadcast',field:true,toggle:'optional',freq:'Hằng tuần',tpl:0,a:1,ev:[]},
+    {c:'system',n:'Bảo trì hệ thống',d:'Thông báo bảo trì, downtime',mode:'broadcast',field:false,toggle:'required',freq:'Ngay',tpl:1,a:1,ev:['system.maintenance']},
+    {c:'security',n:'Bảo mật tài khoản',d:'Cảnh báo đăng nhập thiết bị mới',mode:'personal',field:false,toggle:'required',freq:'Ngay',tpl:1,a:1,ev:['auth.new_device']}
+  ];
+  function renderTypes(){
+    el('c-types').textContent=types.length+' loại';
+    el('tb-types').innerHTML=types.map(function(t){
+      var evc=t.ev.length?'<span class="chip c-gray" title="'+t.ev.map(evLabel).join(', ')+'">'+t.ev.length+' sự kiện</span>':'<span class="chip c-gray" style="opacity:.55">chưa gán</span>';
+      var mode=t.mode==='broadcast'?'<span class="chip c-inapp">Broadcast</span>':'<span class="chip c-gray">Cá nhân</span>';
+      var fld=t.field?'<span style="color:var(--success);font-weight:700">✓</span>':'<span style="color:var(--muted)">–</span>';
+      var tog=t.toggle==='required'?'<span class="chip c-push">Bắt buộc</span>':'<span class="chip c-gray">Tuỳ chọn</span>';
+      return '<tr>'+
+        '<td><span class="tag">'+t.c+'</span></td>'+
+        '<td class="t-title">'+t.n+'</td>'+
+        '<td>'+evc+'</td><td>'+mode+'</td><td>'+fld+'</td><td>'+tog+'</td>'+
+        '<td>'+t.freq+'</td><td class="num">'+t.tpl+'</td>'+
+        '<td><span class="st '+(t.a?'ok':'mut')+'">'+(t.a?'Đang dùng':'Tạm ẩn')+'</span></td>'+
+        '<td><div class="r-acts"><button title="Sửa" data-edit="'+t.c+'">✎</button><button title="Ẩn/hiện" data-toggle="'+t.c+'">◐</button></div></td></tr>';
+    }).join('');
+  }
+
+  /* Modal Thêm/Sửa loại */
+  var tmEditing=null;
+  function segVal(id){var b=el(id).querySelector('button.on');return b?b.getAttribute('data-v'):null;}
+  function segSet(id,v){[].forEach.call(el(id).querySelectorAll('button'),function(b){b.classList.toggle('on',b.getAttribute('data-v')===v);});}
+  function renderEvChecklist(sel){
+    var g={},order=[];
+    EVENTS.forEach(function(e){ if(!g[e.group]){g[e.group]=[];order.push(e.group);} g[e.group].push(e); });
+    el('tm-events').innerHTML=order.map(function(gr){
+      return '<div class="ev-g">'+gr+'</div>'+g[gr].map(function(e){
+        return '<label class="ev-i"><input type="checkbox" value="'+e.id+'"'+(sel.indexOf(e.id)>=0?' checked':'')+'> '+e.label+' <span class="code">'+e.id+'</span></label>';
+      }).join('');
+    }).join('');
+  }
+  function openType(code){
+    tmEditing=code||null;
+    var t=code?types.filter(function(x){return x.c===code;})[0]:null;
+    el('tm-title').textContent=t?('Sửa loại: '+t.n):'Thêm loại thông báo';
+    el('tm-code').value=t?t.c:''; el('tm-code').readOnly=!!t; el('tm-code').style.opacity=t?'.6':'';
+    el('tm-name').value=t?t.n:''; el('tm-desc').value=t&&t.d?t.d:'';
+    el('tm-active').value=t?(t.a?'1':'0'):'1';
+    el('tm-freq').value=t?t.freq:'Ngay';
+    el('tm-field').checked=t?!!t.field:false;
+    segSet('tm-mode',t?t.mode:'broadcast');
+    segSet('tm-toggle',t?t.toggle:'optional');
+    renderEvChecklist(t?t.ev:[]);
+    el('type-modal').classList.add('on');
+  }
+  function closeType(){el('type-modal').classList.remove('on');}
+  function saveType(){
+    var code=el('tm-code').value.trim(), name=el('tm-name').value.trim();
+    if(!code||!name){alert('⚠️ Nhập Mã loại và Tên loại');return;}
+    var ev=[].map.call(el('tm-events').querySelectorAll('input:checked'),function(i){return i.value;});
+    var d={c:code,n:name,d:el('tm-desc').value.trim(),mode:segVal('tm-mode'),field:el('tm-field').checked,toggle:segVal('tm-toggle'),freq:el('tm-freq').value,a:el('tm-active').value==='1',ev:ev};
+    if(tmEditing){var i=types.map(function(x){return x.c;}).indexOf(tmEditing);d.tpl=types[i].tpl;types[i]=d;}
+    else{ if(types.some(function(x){return x.c===code;})){alert('⚠️ Mã loại đã tồn tại');return;} d.tpl=0; types.push(d);}
+    closeType(); renderTypes();
+  }
+  function wireTypeModal(){
+    el('btn-add-type').addEventListener('click',function(){openType(null);});
+    el('tb-types').addEventListener('click',function(e){
+      var ed=e.target.closest('[data-edit]'); if(ed){openType(ed.getAttribute('data-edit'));return;}
+      var tg=e.target.closest('[data-toggle]'); if(tg){var t=types.filter(function(x){return x.c===tg.getAttribute('data-toggle');})[0];if(t){t.a=!t.a;renderTypes();}}
+    });
+    el('tm-save').addEventListener('click',saveType);
+    [].forEach.call(document.querySelectorAll('[data-tmclose]'),function(b){b.addEventListener('click',closeType);});
+    el('type-modal').addEventListener('click',function(e){if(e.target===el('type-modal'))closeType();});
+  }
+
+  var tpls=[
+    {c:'TPL-VB-001',n:'Văn bản mới ban hành',type:'legal_document',ch:['in_app','email','push'],v:'v3',st:'ok',stl:'Đã duyệt'},
+    {c:'TPL-DD-001',n:'Dự thảo mới lấy ý kiến',type:'draft_document',ch:['in_app','email','push','sms'],v:'v2',st:'ok',stl:'Đã duyệt'}
+  ];
+  function renderTpls(){
+    el('tb-templates').innerHTML=tpls.map(function(t){
+      return '<tr><td><span class="tag">'+t.c+'</span></td><td class="t-title">'+t.n+'</td>'+
+        '<td><span class="chip c-gray">'+t.type+'</span></td>'+
+        '<td><div style="display:flex;gap:3px;flex-wrap:wrap">'+chips(t.ch)+'</div></td>'+
+        '<td class="mono">'+t.v+'</td><td><span class="st '+t.st+'">'+t.stl+'</span></td>'+
+        '<td><div class="r-acts"><button title="Sửa">✎</button><button title="Xem trước">👁</button></div></td></tr>';
+    }).join('');
+  }
+
+  var groups=[
+    {n:'Quan tâm Tài chính – Ngân hàng',crit:'Lĩnh vực = Tài chính',type:'Lĩnh vực',size:3240,a:1},
+    {n:'Doanh nghiệp FDI',crit:'Vai trò = Doanh nghiệp · có yếu tố nước ngoài',type:'Vai trò',size:3100,a:1},
+    {n:'Đã góp ý dự thảo 90 ngày',crit:'Hành vi = đã gửi góp ý',type:'Hành vi',size:1200,a:1},
+    {n:'Cộng tác viên tin bài',crit:'Vai trò = CTV',type:'Vai trò',size:420,a:1},
+    {n:'Đã lưu văn bản Đất đai',crit:'Hành vi = lưu văn bản (Đất đai)',type:'Hành vi',size:1800,a:0}
+  ];
+  function renderGroups(){
+    el('tb-groups').innerHTML=groups.map(function(g){
+      return '<tr><td class="t-title">'+g.n+'</td><td style="color:var(--text-2)">'+g.crit+'</td>'+
+        '<td><span class="chip c-gray">'+g.type+'</span></td><td class="num">'+vn(g.size)+'</td>'+
+        '<td><span class="st '+(g.a?'ok':'mut')+'">'+(g.a?'Đang dùng':'Nháp')+'</span></td>'+
+        '<td><div class="r-acts"><button title="Sửa">✎</button><button title="Gửi">📤</button></div></td></tr>';
+    }).join('');
+  }
+
+  var channels=[
+    {ic:'📧',n:'Email',prov:'SMTP · smtp.phapluat.gov.vn',st:'err',stl:'Chưa kích hoạt',meta:[['Người gửi','no-reply@phapluat.gov.vn'],['Giới hạn','1.000/giờ · 5.000/ngày'],['Hiện trạng UAT','đang dùng Gmail test']]},
+    {ic:'📱',n:'Push',prov:'FCM (Android) + APNs (iOS)',st:'warn',stl:'Cần cấu hình',meta:[['Project ID','— chưa nhập —'],['APNs .p8','— chưa nhập —'],['Thiết bị đã đăng ký','4']]},
+    {ic:'📲',n:'In-app',prov:'Hiển thị trực tiếp trên Cổng',st:'ok',stl:'Đang hoạt động',meta:[['Lưu lịch sử','90 ngày'],['Đã gửi','12.450']]},
+    {ic:'💬',n:'SMS',prov:'Brandname PLQG · VNPT SMS',st:'mut',stl:'Tạm dừng',meta:[['Giới hạn ký tự','160'],['Đã gửi','1.120']]},
+    {ic:'🟦',n:'Zalo OA',prov:'Zalo Official Account',st:'mut',stl:'Chưa cấu hình',meta:[['Trạng thái','—']]},
+    {ic:'🔗',n:'Webhook',prov:'Đẩy sự kiện ra hệ thống ngoài',st:'ok',stl:'Đang hoạt động',meta:[['Endpoint','3']]}
+  ];
+  function renderChannels(){
+    el('cfg-grid').innerHTML=channels.map(function(c){
+      return '<div class="cfg"><span class="cfg-badge st '+c.st+'">'+c.stl+'</span>'+
+        '<div class="cfg-top"><div class="cfg-ic">'+c.ic+'</div><div><h3>'+c.n+'</h3><div class="prov">'+c.prov+'</div></div></div>'+
+        '<div class="cfg-meta">'+c.meta.map(function(m){return '<div class="row"><span>'+m[0]+'</span><span class="num">'+m[1]+'</span></div>';}).join('')+'</div>'+
+        '<div class="acts" style="margin-top:13px"><button class="btn btn-s btn-sm">Cấu hình</button><button class="btn btn-g btn-sm">Kiểm tra</button></div></div>';
+    }).join('');
+  }
+
+  var devs=[
+    {u:'Nguyễn Văn A',pf:'Android',dn:'SM-A546 · …a1b2',pr:'FCM',v:'2.4.1',last:'15/07 14:32',st:'ok',stl:'Hoạt động'},
+    {u:'Trần Thị Bình',pf:'iOS',dn:'iPhone14,3 · …9f8e',pr:'APNs',v:'2.4.1',last:'15/07 12:10',st:'ok',stl:'Hoạt động'},
+    {u:'Lê Hồng',pf:'Android',dn:'Pixel 7 · …7c6d',pr:'FCM',v:'2.3.0',last:'02/07 08:20',st:'err',stl:'Token hết hạn'},
+    {u:'Phạm Mai',pf:'iOS',dn:'iPhone13 · …3d2c',pr:'APNs',v:'2.4.1',last:'15/07 09:00',st:'ok',stl:'Hoạt động'}
+  ];
+  function renderDevs(){
+    el('k-dev').innerHTML=kpi('Thiết bị đăng ký','4')+kpi('Android','2')+kpi('iOS','2')+kpi('Token lỗi','1','cần dọn','dn');
+    el('tb-dev').innerHTML=devs.map(function(d){
+      return '<tr><td class="t-title">'+d.u+'</td><td>'+d.pf+'</td><td class="mono" style="font-size:12px">'+d.dn+'</td><td>'+d.pr+'</td><td class="mono">'+d.v+'</td><td>'+d.last+'</td><td><span class="st '+d.st+'">'+d.stl+'</span></td></tr>';
+    }).join('');
+  }
+
+  var batches=[
+    {tm:'15/07 14:30',t:'Văn bản mới: NĐ 280/2026/NĐ-CP',ch:'email',tot:3240,ok:3180,f:12,st:'ok',stl:'Hoàn tất'},
+    {tm:'15/07 14:30',t:'Văn bản mới: NĐ 280/2026/NĐ-CP',ch:'push',tot:2100,ok:1980,f:120,st:'err',stl:'Có lỗi'},
+    {tm:'15/07 14:00',t:'Dự thảo Luật Đất đai sửa đổi',ch:'email',tot:12450,ok:8900,f:60,st:'warn',stl:'Đang gửi'},
+    {tm:'15/07 14:00',t:'Dự thảo Luật Đất đai sửa đổi',ch:'sms',tot:12450,ok:0,f:0,st:'mut',stl:'Chờ gửi'},
+    {tm:'14/07 18:00',t:'Bảo trì hệ thống 15/07',ch:'sms',tot:12450,ok:12100,f:350,st:'err',stl:'Có lỗi'},
+    {tm:'11/07 16:45',t:'Phản ánh #PA-00482 đã xử lý',ch:'email',tot:1,ok:1,f:0,st:'ok',stl:'Hoàn tất'}
+  ];
+  function renderDel(){
+    var ok=batches.reduce(function(s,b){return s+b.ok;},0),f=batches.reduce(function(s,b){return s+b.f;},0),
+        pend=batches.reduce(function(s,b){return s+(b.tot-b.ok-b.f);},0),rate=Math.round(ok/(ok+f)*100);
+    el('k-del').innerHTML=kpi('Chờ gửi',vn(pend))+kpi('Thành công',vn(ok),'đã giao','up')+kpi('Thất bại',vn(f),'cần xử lý','dn')+kpi('Tỷ lệ thành công',rate+'%','','up');
+    el('c-del').textContent=batches.length+' lô gửi';
+    el('tb-del').innerHTML=batches.map(function(b){
+      var pc=Math.round((b.ok+b.f)/b.tot*100),bc=b.st==='ok'?'g':b.st==='warn'?'w':b.st==='err'?'r':'';
+      return '<tr><td style="color:var(--muted);font-size:12px">'+b.tm+'</td><td class="t-title">'+b.t+'</td>'+
+        '<td>'+chips([b.ch])+'</td><td class="num">'+vn(b.tot)+'</td>'+
+        '<td class="num" style="color:var(--success)">'+vn(b.ok)+'</td>'+
+        '<td class="num" style="color:'+(b.f?'var(--danger)':'var(--muted)')+'">'+vn(b.f)+'</td>'+
+        '<td><div class="prog"><div class="bar"><i class="'+bc+'" style="width:'+pc+'%"></i></div><span class="pc num">'+pc+'%</span></div></td>'+
+        '<td><span class="st '+b.st+'">'+b.stl+'</span></td></tr>';
+    }).join('');
+  }
+
+  var users=[{id:'u1',n:'Nguyễn Văn A'},{id:'u2',n:'Trần Thị Bình'},{id:'u3',n:'Lê Hồng'}];
+  var recs={u1:[
+      {tm:'13/07 09:15',t:'Văn bản mới: NĐ 280/2026/NĐ-CP',ia:'Đã mở',em:'Đã nhấp',pu:'Đã nhận',st:'ok',stl:'Đã nhấp'},
+      {tm:'12/07 14:00',t:'Dự thảo Luật Đất đai sửa đổi',ia:'Đã mở',em:'Đã mở',pu:'—',st:'ok',stl:'Đã mở'},
+      {tm:'12/07 11:23',t:'Câu hỏi #QA-2024-1876 đã trả lời',ia:'Đã nhấp',em:'Đã nhận',pu:'—',st:'ok',stl:'Đã nhấp'},
+      {tm:'10/07 08:00',t:'Khảo sát dịch vụ công 2026',ia:'Đã nhận',em:'Trả về',pu:'—',st:'info',stl:'Bounce'},
+      {tm:'08/07 18:00',t:'Bảo trì hệ thống 09/07',ia:'Đã mở',em:'—',pu:'Thất bại',st:'err',stl:'Lỗi Push'}
+    ],
+    u2:[{tm:'11/07 16:45',t:'Phản ánh #PA-00482 đã xử lý',ia:'Đã mở',em:'Đã nhấp',pu:'—',st:'ok',stl:'Đã nhấp'},
+      {tm:'09/07 10:30',t:'Chủ đề CCHC có phản hồi mới',ia:'Đã nhận',em:'—',pu:'Đã mở',st:'ok',stl:'Đã mở'}],
+    u3:[{tm:'07/07 08:00',t:'Văn bản sắp có hiệu lực: TT 09/2026',ia:'Đã nhận',em:'Trả về',pu:'—',st:'info',stl:'Bounce'}]};
+  function renderRec(){
+    el('ru').innerHTML=users.map(function(u){return '<option value="'+u.id+'">'+u.n+'</option>';}).join('');
+    drawRec('u1');
+  }
+  function cell(v){var mut=(v==='—'),err=(v==='Thất bại'||v==='Trả về');return '<td style="color:'+(mut?'var(--muted)':err?'var(--danger)':'var(--text)')+'">'+v+'</td>';}
+  function drawRec(uid){
+    var list=recs[uid]||[];
+    var opened=list.filter(function(r){return r.st==='ok';}).length;
+    el('k-rec').innerHTML=kpi('Đã nhận',list.length)+kpi('Tỷ lệ mở',(list.length?Math.round(opened/list.length*100):0)+'%')+
+      kpi('Lỗi / Bounce',list.filter(function(r){return r.st==='err'||r.st==='info';}).length)+kpi('Kênh chính','In-app');
+    el('tb-rec').innerHTML=list.map(function(r){
+      return '<tr><td style="color:var(--muted);font-size:12px">'+r.tm+'</td><td class="t-title">'+r.t+'</td>'+cell(r.ia)+cell(r.em)+cell(r.pu)+
+        '<td><span class="st '+r.st+'">'+r.stl+'</span></td></tr>';
+    }).join('');
+  }
+
+  function renderStats(){
+    el('k-stats').innerHTML=kpi('Tổng đã gửi','28.340','+12%','up',[420,580,670,510,760,940,1180])+
+      kpi('Tỷ lệ mở TB','71%','19.300 lượt','up')+kpi('Tỷ lệ nhấp TB','31%','8.680 lượt','up')+kpi('Kênh tốt nhất','In-app','79% mở','up');
+    var vals=[420,580,670,510,720,390,260,760,940,1020,870,1180,640,320],days=['T2','T3','T4','T5','T6','T7','CN','T2','T3','T4','T5','T6','T7','CN'],mx=Math.max.apply(null,vals);
+    el('chart').innerHTML=vals.map(function(v,i){return '<div class="col"><div class="b" data-v="'+vn(v)+'" style="height:'+Math.round(v/mx*88)+'%"></div><div class="x">'+days[i]+'</div></div>';}).join('');
+    el('donut').style.background='conic-gradient(var(--accent) 0 45%,var(--success) 45% 70%,var(--warning) 70% 85%,var(--info) 85% 100%)';
+    el('legend').innerHTML=[['var(--accent)','Văn bản · 45%'],['var(--success)','Hỏi đáp · 25%'],['var(--warning)','Phản ánh · 15%'],['var(--info)','Khác · 15%']].map(function(x){return '<div><span class="dot" style="background:'+x[0]+'"></span>'+x[1]+'</div>';}).join('');
+    var scs=[['in_app',12450,9870,4560],['email',8230,5120,2140],['push',6540,4310,1980],['sms',1120,0,0]];
+    el('tb-stats').innerHTML=scs.map(function(s){
+      var no=s[2]===0,or=s[1]?Math.round(s[2]/s[1]*100):0,ct=s[1]?Math.round(s[3]/s[1]*100):0;
+      return '<tr><td>'+chips([s[0]])+'</td><td class="num">'+vn(s[1])+'</td><td class="num">'+(no?'–':vn(s[2]))+'</td>'+
+        '<td>'+(no?'<span style="color:var(--muted)">Không theo dõi</span>':'<div class="prog"><div class="bar"><i class="g" style="width:'+or+'%"></i></div><span class="pc num">'+or+'%</span></div>')+'</td>'+
+        '<td class="num">'+(no?'–':vn(s[3]))+'</td>'+
+        '<td>'+(no?'–':'<div class="prog"><div class="bar"><i style="width:'+ct+'%"></i></div><span class="pc num">'+ct+'%</span></div>')+'</td></tr>';
+    }).join('');
+  }
+
+  el('ru').addEventListener('change',function(e){drawRec(e.target.value);});
+
+  /* ---------- COMPOSE: chế độ phát hành ---------- */
+  var pubFields={
+    now:'<div class="fr full"><div class="callout" style="margin:0;padding:11px 14px"><span class="ci">⚡</span><div>Thông báo được gửi <b>ngay</b> tới người nhận khi bạn bấm "Gửi thông báo".</div></div></div>',
+    sched:'<div class="fr"><label>Ngày gửi *</label><input class="inp" type="date" value="2026-07-20"></div>'+
+      '<div class="fr"><label>Giờ gửi *</label><input class="inp" type="time" value="09:00"></div>'+
+      '<div class="fr"><label>Múi giờ</label><select class="sel"><option>Việt Nam (UTC+7)</option><option>UTC</option></select></div>'+
+      '<div class="fr"><label>Lặp lại</label><select class="sel"><option>Một lần</option><option>Hàng ngày</option><option>Hàng tuần</option><option>Hàng tháng</option></select></div>',
+    event:'<div class="fr full"><label>Sự kiện kích hoạt * <span class="hint">(nguồn dữ liệu &amp; biến của thông báo)</span></label><select class="sel"><option>document.created · Văn bản mới ban hành → {{document.*}}</option><option>document.effective_soon · Văn bản sắp có hiệu lực → {{document.*}}</option><option>draft.created · Dự thảo mới lấy ý kiến → {{draft.*}}</option><option>draft.deadline_near · Sắp hết hạn góp ý → {{draft.*}}</option><option>question.answered · Câu hỏi được trả lời → {{question.*}}</option><option>petition.resolved · Phản ánh được xử lý → {{petition.*}}</option><option>system.maintenance · Bảo trì hệ thống → {{maintenance.*}}</option></select></div>'+
+      '<div class="fr full"><label>Điều kiện lọc <span class="hint">(chỉ kích hoạt khi thỏa)</span></label><select class="sel"><option>Không lọc — mọi bản ghi</option><option>Lĩnh vực = Tài chính – Ngân hàng</option><option>Lĩnh vực = Đất đai</option><option>Cơ quan ban hành = Bộ Tư pháp</option><option>Loại văn bản = Nghị định</option></select></div>'+
+      '<div class="fr"><label>Trễ sau kích hoạt</label><div style="display:flex;gap:6px"><input class="inp num" type="number" value="0" min="0" style="width:74px"><select class="sel" style="flex:1"><option>phút</option><option>giờ</option><option>ngày</option></select></div></div>'+
+      '<div class="fr"><label>Chống trùng</label><select class="sel"><option>1 lần / người / sự kiện</option><option>Tối đa 1 lần / ngày</option><option>Không giới hạn</option></select></div>'+
+      '<div class="fr full"><div class="callout" style="margin:0;padding:11px 14px"><span class="ci">🔔</span><div><b>Nội dung lấy từ Mẫu</b> (cột trái — bắt buộc chọn). Biến trong mẫu được <b>điền tự động</b> từ dữ liệu bản ghi sinh ra sự kiện; người nhận xác định theo <b>quy tắc</b> bên dưới.</div></div></div>'
+  };
+  var recipBox={
+    manual:'<div class="fr full"><label>Nhóm người nhận</label><select class="sel"><option>Tất cả người dùng</option><option>Theo lĩnh vực quan tâm</option><option>Theo vai trò</option><option>Theo hành vi (đã lưu văn bản / góp ý)</option><option>Nhóm tùy chỉnh</option></select></div>'+
+      '<div class="fr full"><div class="callout" style="margin:0;padding:11px 14px"><span class="ci">👥</span><div>Ước tính <b class="num">12.450</b> người nhận cho lần gửi này.</div></div></div>',
+    event:'<div class="fr full"><label>Quy tắc người nhận <span class="hint">(tính động khi sự kiện xảy ra)</span></label><select class="sel"><option>Người đang theo dõi lĩnh vực của bản ghi</option><option>Người đang theo dõi cơ quan ban hành</option><option>Người đã lưu / xem bản ghi liên quan</option><option>Người đã góp ý dự thảo này</option><option>Tất cả người dùng</option></select></div>'+
+      '<div class="fr full"><div class="callout" style="margin:0;padding:11px 14px"><span class="ci">👥</span><div>Ước tính <b class="num">~3.240</b> người / lần kích hoạt · ~50 lần/tháng. Danh sách nhận được <b>tính lại tại thời điểm sự kiện</b>, không cố định.</div></div></div>'
+  };
+  var pubLabel={now:'🚀 Gửi thông báo',sched:'📅 Lưu lịch gửi',event:'⚡ Kích hoạt trigger'};
+  function renderPub(m){
+    if(el('pubfields'))el('pubfields').innerHTML=pubFields[m]||pubFields.now;
+    if(el('btn-pub-send'))el('btn-pub-send').textContent=pubLabel[m]||pubLabel.now;
+    if(el('recipbox'))el('recipbox').innerHTML=(m==='event')?recipBox.event:recipBox.manual;
+    // Sự kiện: nội dung do Mẫu sinh động → khoá nhập tay, Mẫu thành bắt buộc
+    var ev=(m==='event');
+    var t=el('c-title'),c=el('c-content'),tpl=el('c-template');
+    if(t){t.disabled=ev; t.style.opacity=ev?'.5':''; }
+    if(c){c.disabled=ev; c.style.opacity=ev?'.5':''; }
+    if(tpl)tpl.style.borderColor=ev?'var(--accent)':'';
+    if(el('c-template-l'))el('c-template-l').innerHTML=ev?'Mẫu áp dụng * <span class="hint">(nội dung &amp; biến lấy từ đây)</span>':'Mẫu áp dụng';
+    if(el('c-title-l'))el('c-title-l').innerHTML=ev?'Tiêu đề <span class="hint">(tự tạo từ mẫu khi kích hoạt)</span>':'Tiêu đề *';
+  }
+  document.querySelectorAll('.seg').forEach(function(seg){
+    seg.addEventListener('click',function(e){
+      var b=e.target.closest('button'); if(!b)return;
+      seg.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);});
+      if(seg.id==='pubseg') renderPub(b.dataset.mode);
+    });
+  });
+  renderPub('now');
+
+  renderList();renderTypes();renderTpls();renderGroups();renderChannels();renderDevs();renderDel();renderRec();renderStats();wireTypeModal();
+})();
+</script>
+
+</body>
+</html>
