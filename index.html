@@ -241,6 +241,11 @@
   .cond-row .sel{flex:1;min-width:0}
   .cond-x{width:32px;height:34px;border:1px solid var(--border);background:var(--surface);border-radius:var(--r);cursor:pointer;color:var(--muted);flex-shrink:0}
   .cond-x:hover{background:var(--danger-bg);color:var(--danger)}
+  .vchips{display:flex;flex-wrap:wrap;gap:5px}
+  .vchip{font-family:var(--mono);font-size:11px;border:1px solid var(--border);background:var(--surface-2);color:var(--accent);border-radius:5px;padding:2px 7px;cursor:pointer}
+  .vchip:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .tp-blk{border:1px solid var(--border);border-radius:var(--r);padding:12px;background:var(--surface-2)}
+  .tp-blk h5{margin:0 0 8px;font-size:12.5px}
 </style>
 </head>
 <body>
@@ -361,7 +366,7 @@
 
     <!-- VIEW: TEMPLATES -->
     <section class="view page" id="v-templates">
-      <div class="ph"><div><h1 class="pt">Mẫu thông báo</h1><p class="ps">Nội dung mẫu riêng cho từng kênh (In-app · Email · Push) kèm biến động &amp; phiên bản</p></div><div class="acts"><button class="btn btn-p">+ Tạo mẫu</button></div></div>
+      <div class="ph"><div><h1 class="pt">Mẫu thông báo</h1><p class="ps">Nội dung mẫu riêng cho từng kênh (In-app · Email · Push) kèm biến động &amp; phiên bản</p></div><div class="acts"><button class="btn btn-p" id="btn-add-tpl">+ Tạo mẫu</button></div></div>
       <div class="callout warn"><span class="ci">⚠️</span><div><h4>Hiện trạng UAT</h4>Chỉ có <b>2 mẫu</b> trên tổng <b>15 loại</b> thông báo — cần bổ sung mẫu cho các loại còn lại trước nghiệm thu.</div></div>
       <div class="tw"><div class="tscroll"><table>
         <thead><tr><th>Mã</th><th>Tên mẫu</th><th>Loại</th><th>Kênh có nội dung</th><th>Phiên bản</th><th>Trạng thái</th><th></th></tr></thead>
@@ -471,6 +476,33 @@
       </div>
     </div>
     <div class="modal-f"><button class="btn btn-g" data-smclose>Huỷ</button><button class="btn btn-p" id="sm-save">💾 Lưu nhóm</button></div>
+  </div>
+</div>
+
+<!-- MODAL: Tạo/Sửa mẫu thông báo (CMS-545) -->
+<div class="modal-bg" id="tpl-modal">
+  <div class="modal" style="max-width:720px">
+    <div class="modal-h"><h3 id="tp-title">Tạo mẫu thông báo</h3><button class="modal-x" data-tpclose>✕</button></div>
+    <div class="modal-b">
+      <div class="form">
+        <div class="fr"><label>Mã mẫu *</label><input class="inp mono" id="tp-code" placeholder="vd: TPL-VB-002"></div>
+        <div class="fr"><label>Trạng thái</label><select class="sel" id="tp-status"><option>Nháp</option><option>Chờ duyệt</option><option>Đã duyệt</option></select></div>
+        <div class="fr full"><label>Tên mẫu *</label><input class="inp" id="tp-name" placeholder="vd: Văn bản mới ban hành"></div>
+        <div class="fr full"><label>Loại thông báo</label><select class="sel" id="tp-type"></select></div>
+        <div class="fr full"><label>Kênh có nội dung</label><div class="checks" id="tp-channels">
+          <label class="ck"><input type="checkbox" value="in_app" checked> In-app</label>
+          <label class="ck"><input type="checkbox" value="email" checked> Email</label>
+          <label class="ck"><input type="checkbox" value="push"> Push</label>
+          <label class="ck"><input type="checkbox" value="sms"> SMS</label>
+        </div></div>
+        <div class="fr full"><label>Biến khả dụng <span class="hint">(bấm để chèn vào ô đang chọn)</span></label><div class="vchips" id="tp-vars"></div></div>
+        <div class="fr full" id="tp-blk-in_app"><div class="tp-blk"><h5>📲 In-app</h5><textarea class="inp" rows="2" data-ed placeholder="Nội dung hiển thị trong ứng dụng…"></textarea></div></div>
+        <div class="fr full" id="tp-blk-email"><div class="tp-blk"><h5>📧 Email</h5><input class="inp" data-ed placeholder="Tiêu đề email" style="margin-bottom:8px"><textarea class="inp" rows="3" data-ed placeholder="Nội dung email (hỗ trợ HTML)…"></textarea></div></div>
+        <div class="fr full" id="tp-blk-push"><div class="tp-blk"><h5>📱 Push</h5><input class="inp" data-ed placeholder="Tiêu đề push" style="margin-bottom:8px"><textarea class="inp" rows="2" data-ed placeholder="Nội dung push…"></textarea></div></div>
+        <div class="fr full" id="tp-blk-sms"><div class="tp-blk"><h5>💬 SMS</h5><textarea class="inp" rows="2" data-ed placeholder="Nội dung SMS…"></textarea><div class="hint" style="margin-top:4px">Giới hạn 160 ký tự · nên dùng biến rút gọn, không dấu</div></div></div>
+      </div>
+    </div>
+    <div class="modal-f"><button class="btn btn-g" data-tpclose>Huỷ</button><button class="btn btn-p" id="tp-save">💾 Lưu mẫu</button></div>
   </div>
 </div>
 
@@ -645,7 +677,7 @@
         '<td><span class="chip c-gray">'+t.type+'</span></td>'+
         '<td><div style="display:flex;gap:3px;flex-wrap:wrap">'+chips(t.ch)+'</div></td>'+
         '<td class="mono">'+t.v+'</td><td><span class="st '+t.st+'">'+t.stl+'</span></td>'+
-        '<td><div class="r-acts"><button title="Sửa">✎</button><button title="Xem trước">👁</button></div></td></tr>';
+        '<td><div class="r-acts"><button title="Sửa" data-tpedit="'+t.c+'">✎</button><button title="Xem trước">👁</button></div></td></tr>';
     }).join('');
   }
 
@@ -779,8 +811,9 @@
       '<div class="fr full"><div class="callout" style="margin:0;padding:11px 14px"><span class="ci">🔔</span><div><b>Nội dung lấy từ Mẫu</b> (cột trái — bắt buộc chọn). Biến trong mẫu được <b>điền tự động</b> từ dữ liệu bản ghi sinh ra sự kiện; người nhận xác định theo <b>quy tắc</b> bên dưới.</div></div></div>'
   };
   var recipBox={
-    manual:'<div class="fr full"><label>Nhóm người nhận</label><select class="sel"><option>Tất cả người dùng</option><option>Theo lĩnh vực quan tâm</option><option>Theo vai trò</option><option>Theo hành vi (đã lưu văn bản / góp ý)</option><option>Nhóm tùy chỉnh</option></select></div>'+
-      '<div class="fr full"><div class="callout" style="margin:0;padding:11px 14px"><span class="ci">👥</span><div>Ước tính <b class="num">12.450</b> người nhận cho lần gửi này.</div></div></div>',
+    manual:'<div class="fr full"><label>Nhóm người nhận</label><select class="sel" id="mf-aud"><option>Tất cả người dùng</option><option>Theo lĩnh vực quan tâm</option><option>Theo vai trò</option><option>Theo hành vi (đã lưu văn bản / góp ý)</option><option>Nhóm tùy chỉnh</option></select></div>'+
+      '<div class="fr full" id="mf-sub"></div>'+
+      '<div class="fr full"><div class="callout" style="margin:0;padding:11px 14px"><span class="ci">👥</span><div>Ước tính <b class="num" id="mf-est">12.450</b> người nhận cho lần gửi này.</div></div></div>',
     event:'<div class="fr full"><label>Quy tắc người nhận <span class="hint">(tính động khi sự kiện xảy ra)</span></label><select class="sel"><option>Người đang theo dõi lĩnh vực của bản ghi</option><option>Người đang theo dõi cơ quan ban hành</option><option>Người đã lưu / xem bản ghi liên quan</option><option>Người đã góp ý dự thảo này</option><option>Tất cả người dùng</option></select></div>'+
       '<div class="fr full"><div class="callout" style="margin:0;padding:11px 14px"><span class="ci">👥</span><div>Ước tính <b class="num">~3.240</b> người / lần kích hoạt · ~50 lần/tháng. Danh sách nhận được <b>tính lại tại thời điểm sự kiện</b>, không cố định.</div></div></div>'
   };
@@ -789,6 +822,7 @@
     if(el('pubfields'))el('pubfields').innerHTML=pubFields[m]||pubFields.now;
     if(el('btn-pub-send'))el('btn-pub-send').textContent=pubLabel[m]||pubLabel.now;
     if(el('recipbox'))el('recipbox').innerHTML=(m==='event')?recipBox.event:recipBox.manual;
+    if(m!=='event'&&el('mf-aud'))mfRenderSub();
     // Sự kiện: nội dung do Mẫu sinh động → khoá nhập tay, Mẫu thành bắt buộc
     var ev=(m==='event');
     var t=el('c-title'),c=el('c-content'),tpl=el('c-template');
@@ -804,6 +838,35 @@
       seg.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);});
       if(seg.id==='pubseg') renderPub(b.dataset.mode);
     });
+  });
+  // Chọn con cho "Đối tượng nhận" (theo lĩnh vực / vai trò / hành vi / nhóm)
+  var mfSub={
+    'Theo lĩnh vực quan tâm':{label:'Chọn lĩnh vực',opts:[['Tài chính – Ngân hàng',3240],['Đất đai',2100],['Lao động – BHXH',1560],['Giao thông',980]]},
+    'Theo vai trò':{label:'Chọn vai trò',opts:[['Người dân',8200],['Doanh nghiệp',3100],['Cộng tác viên',420]]},
+    'Theo hành vi (đã lưu văn bản / góp ý)':{label:'Chọn tiêu chí hành vi',opts:[['Đã theo dõi lĩnh vực',2400],['Đã lưu văn bản 30 ngày',1800],['Đã góp ý dự thảo',1200]]}
+  };
+  function mfRecalc(){
+    var v=el('mf-aud').value;
+    if(v==='Tất cả người dùng'){el('mf-est').textContent='12.450';return;}
+    if(v==='Nhóm tùy chỉnh'){var s=el('mf-grp');if(s){el('mf-est').textContent=(parseInt(s.options[s.selectedIndex].getAttribute('data-size'),10)||0).toLocaleString('vi-VN');}return;}
+    var sum=[].reduce.call(el('mf-sub').querySelectorAll('input:checked'),function(a,c){return a+(parseInt(c.getAttribute('data-size'),10)||0);},0);
+    el('mf-est').textContent=(sum||0).toLocaleString('vi-VN');
+  }
+  function mfRenderSub(){
+    var v=el('mf-aud').value, box=el('mf-sub');
+    if(v==='Tất cả người dùng'){box.innerHTML='';el('mf-est').textContent='12.450';return;}
+    if(v==='Nhóm tùy chỉnh'){
+      box.innerHTML='<label>Nhóm đã lưu</label><select class="sel" id="mf-grp">'+groups.map(function(g){return '<option data-size="'+g.size+'">'+g.n+' ('+vn(g.size)+')</option>';}).join('')+'</select>';
+      mfRecalc();return;
+    }
+    var cfg=mfSub[v]; if(!cfg){box.innerHTML='';return;}
+    box.innerHTML='<label>'+cfg.label+' <span class="hint">(chọn 1 hoặc nhiều)</span></label><div class="checks">'+cfg.opts.map(function(o,i){return '<label class="ck"><input type="checkbox" data-size="'+o[1]+'"'+(i===0?' checked':'')+'> '+o[0]+'</label>';}).join('')+'</div>';
+    mfRecalc();
+  }
+  el('recipbox').addEventListener('change',function(e){
+    if(e.target.id==='mf-aud')mfRenderSub();
+    else if(e.target.id==='mf-grp')mfRecalc();
+    else if(e.target.type==='checkbox')mfRecalc();
   });
   renderPub('now');
 
@@ -877,7 +940,58 @@
     el('tb-groups').addEventListener('click',function(e){var ed=e.target.closest('[data-gedit]');if(ed)openSeg(ed.getAttribute('data-gedit'));});
   }
 
-  renderList();renderTypes();renderTpls();renderGroups();renderChannels();renderDevs();renderDel();renderRec();renderStats();wireTypeModal();wireSeg();
+  /* ---------- CMS-545: Editor mẫu thông báo ---------- */
+  var TPL_VARS=['{{user.full_name}}','{{document.title}}','{{document.field}}','{{document.effective_date}}','{{document.url}}','{{system.name}}'];
+  var tpFocus=null;
+  function tpToggleBlocks(){
+    ['in_app','email','push','sms'].forEach(function(ch){
+      var cb=document.querySelector('#tp-channels input[value="'+ch+'"]'), blk=el('tp-blk-'+ch);
+      if(blk) blk.style.display=(cb&&cb.checked)?'':'none';
+    });
+  }
+  function openTpl(code){
+    var t=code?tpls.filter(function(x){return x.c===code;})[0]:null;
+    el('tp-title').textContent=t?('Sửa mẫu: '+t.n):'Tạo mẫu thông báo';
+    el('tp-code').value=t?t.c:''; el('tp-code').readOnly=!!t; el('tp-code').style.opacity=t?'.6':'';
+    el('tp-name').value=t?t.n:'';
+    el('tp-type').innerHTML=types.map(function(x){return '<option value="'+x.c+'">'+x.n+' ('+x.c+')</option>';}).join('');
+    if(t) el('tp-type').value=t.type;
+    el('tp-status').value=t?t.stl:'Nháp';
+    document.querySelectorAll('#tp-channels input').forEach(function(cb){cb.checked=t?(t.ch.indexOf(cb.value)>=0):(cb.value==='in_app'||cb.value==='email');});
+    el('tp-vars').innerHTML=TPL_VARS.map(function(v){return '<button class="vchip" type="button">'+v+'</button>';}).join('');
+    document.querySelectorAll('#tpl-modal [data-ed]').forEach(function(e){e.value='';});
+    tpToggleBlocks(); el('tpl-modal').classList.add('on');
+  }
+  function closeTpl(){el('tpl-modal').classList.remove('on');}
+  function saveTpl(){
+    var code=el('tp-code').value.trim(), name=el('tp-name').value.trim();
+    if(!code||!name){alert('⚠️ Nhập Mã mẫu và Tên mẫu');return;}
+    var ch=[].map.call(document.querySelectorAll('#tp-channels input:checked'),function(i){return i.value;});
+    if(!ch.length){alert('⚠️ Chọn ít nhất 1 kênh có nội dung');return;}
+    var st=el('tp-status').value, m={'Đã duyệt':'ok','Chờ duyệt':'warn','Nháp':'mut'};
+    var rec={c:code,n:name,type:el('tp-type').value,ch:ch,v:'v1',st:m[st]||'mut',stl:st};
+    var i=tpls.map(function(x){return x.c;}).indexOf(code);
+    if(i>=0){rec.v=tpls[i].v; tpls[i]=rec;} else tpls.unshift(rec);
+    closeTpl(); renderTpls();
+  }
+  function wireTpl(){
+    var add=document.getElementById('btn-add-tpl'); if(add) add.addEventListener('click',function(){openTpl(null);});
+    el('tp-channels').addEventListener('change',tpToggleBlocks);
+    document.querySelectorAll('#tpl-modal [data-ed]').forEach(function(e){e.addEventListener('focus',function(){tpFocus=e;});});
+    el('tp-vars').addEventListener('click',function(e){
+      var b=e.target.closest('.vchip'); if(!b)return;
+      var f=tpFocus||document.querySelector('#tp-blk-in_app [data-ed]');
+      if(f){var s=(f.selectionStart!=null)?f.selectionStart:f.value.length, en=(f.selectionEnd!=null)?f.selectionEnd:s;
+        f.value=f.value.slice(0,s)+b.textContent+f.value.slice(en); f.focus();
+        var p=s+b.textContent.length; try{f.setSelectionRange(p,p);}catch(x){}}
+    });
+    el('tp-save').addEventListener('click',saveTpl);
+    [].forEach.call(document.querySelectorAll('[data-tpclose]'),function(b){b.addEventListener('click',closeTpl);});
+    el('tpl-modal').addEventListener('click',function(e){if(e.target===el('tpl-modal'))closeTpl();});
+    el('tb-templates').addEventListener('click',function(e){var ed=e.target.closest('[data-tpedit]');if(ed)openTpl(ed.getAttribute('data-tpedit'));});
+  }
+
+  renderList();renderTypes();renderTpls();renderGroups();renderChannels();renderDevs();renderDel();renderRec();renderStats();wireTypeModal();wireSeg();wireTpl();
 })();
 </script>
 
