@@ -459,8 +459,7 @@
     <div class="modal-h"><h3 id="sm-title">Tạo nhóm đối tượng</h3><button class="modal-x" data-smclose>✕</button></div>
     <div class="modal-b">
       <div class="form">
-        <div class="fr"><label>Tên nhóm *</label><input class="inp" id="sm-name" placeholder="vd: Quan tâm Đất đai"></div>
-        <div class="fr"><label>Loại nhóm</label><div class="seg" id="sm-kind"><button class="on" data-v="dynamic">Động</button><button data-v="static">Tĩnh</button></div></div>
+        <div class="fr full"><label>Tên nhóm *</label><input class="inp" id="sm-name" placeholder="vd: Quan tâm Đất đai"></div>
         <div class="fr full"><label>Mô tả</label><input class="inp" id="sm-desc"></div>
         <div class="fr full">
           <label>Điều kiện lọc <span class="hint">(Hồ sơ + Hành vi)</span></label>
@@ -845,7 +844,7 @@
   function openSeg(name){
     el('sm-title').textContent=name?('Sửa nhóm: '+name):'Tạo nhóm đối tượng';
     el('sm-name').value=name||''; el('sm-desc').value='';
-    segSet('sm-kind','dynamic'); el('sm-logic').value='all';
+    el('sm-logic').value='all';
     el('sm-conds').innerHTML=''; el('sm-conds').appendChild(condRow());
     segRecalc(); el('seg-modal').classList.add('on');
   }
@@ -859,7 +858,8 @@
       var a=ATTRS.filter(function(x){return x.id===r.querySelector('.attr').value;})[0];
       return (a?a.label:'?')+' '+r.querySelector('.op').value+' '+r.querySelector('.val').value;
     }).join(join)||'—';
-    groups.unshift({n:name,crit:crit,type:segVal('sm-kind')==='dynamic'?'Động':'Tĩnh',size:parseInt(el('sm-est').textContent.replace(/\D/g,''),10)||0,a:1});
+    var fa=rows.length?ATTRS.filter(function(x){return x.id===rows[0].querySelector('.attr').value;})[0]:null;
+    groups.unshift({n:name,crit:crit,type:fa?fa.group:'Tùy chỉnh',size:parseInt(el('sm-est').textContent.replace(/\D/g,''),10)||0,a:1});
     closeSeg(); renderGroups();
   }
   function wireSeg(){
