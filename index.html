@@ -348,7 +348,7 @@
         <div>
           <div class="panel"><div class="panel-h"><h3>Phát hành</h3><span class="tag">schedule_type</span></div><div class="panel-b">
             <div class="seg" id="pubseg" style="margin-bottom:14px">
-              <button class="on" data-mode="now">Gửi ngay</button><button data-mode="sched">Lập lịch</button><button data-mode="event">Theo sự kiện</button>
+              <button class="on" data-mode="now">Thủ công</button><button data-mode="sched">Lập lịch</button><button data-mode="event">Theo sự kiện</button>
             </div>
             <div class="form" id="pubfields"></div>
           </div></div>
@@ -759,7 +759,8 @@
 
   /* ---------- COMPOSE: chế độ phát hành ---------- */
   var pubFields={
-    now:'<div class="fr full"><div class="callout" style="margin:0;padding:11px 14px"><span class="ci">⚡</span><div>Thông báo được gửi <b>ngay</b> tới người nhận khi bạn bấm "Gửi thông báo".</div></div></div>',
+    now:'<div class="fr"><label>Tần suất gửi</label><select class="sel"><option>Tức thời (gửi ngay)</option><option>Định kỳ theo ngày</option><option>Định kỳ theo tuần</option><option>Định kỳ theo tháng</option></select></div>'+
+      '<div class="fr full"><div class="callout" style="margin:0;padding:11px 14px"><span class="ci">⚡</span><div><b>Tức thời</b>: gửi ngay khi bấm. <b>Định kỳ</b>: gom &amp; gửi lặp lại theo chu kỳ đã chọn.</div></div></div>',
     sched:'<div class="fr"><label>Ngày gửi *</label><input class="inp" type="date" value="2026-07-20"></div>'+
       '<div class="fr"><label>Giờ gửi *</label><input class="inp" type="time" value="09:00"></div>'+
       '<div class="fr"><label>Múi giờ</label><select class="sel"><option>Việt Nam (UTC+7)</option><option>UTC</option></select></div>'+
