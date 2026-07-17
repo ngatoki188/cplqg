@@ -358,7 +358,7 @@
       <div class="ph"><div><h1 class="pt">Loại thông báo</h1><p class="ps">Danh mục loại — nối <b>sự kiện</b> kỹ thuật với tuỳ chọn nhận của người dân</p></div><div class="acts"><button class="btn btn-p" id="btn-add-type">+ Thêm loại</button></div></div>
       <div class="tb"><div class="tb-l"><div class="search"><input placeholder="Tìm loại…"></div><select class="sel"><option>Mọi kiểu gửi</option><option>Broadcast</option><option>Cá nhân</option></select></div><span class="count" id="c-types"></span></div>
       <div class="tw"><div class="tscroll"><table>
-        <thead><tr><th>Mã</th><th>Tên loại</th><th>Sự kiện gộp</th><th>Kiểu gửi</th><th>Lĩnh vực</th><th>Người dân</th><th>Tần suất</th><th>Mẫu</th><th>Trạng thái</th><th></th></tr></thead>
+        <thead><tr><th>Mã</th><th>Tên loại</th><th>Sự kiện gộp</th><th>Lĩnh vực</th><th>Mẫu</th><th>Trạng thái</th><th></th></tr></thead>
         <tbody id="tb-types"></tbody>
       </table></div></div>
     </section>
@@ -436,10 +436,7 @@
         <div class="fr"><label>Trạng thái</label><select class="sel" id="tm-active"><option value="1">Đang dùng</option><option value="0">Tạm ẩn</option></select></div>
         <div class="fr full"><label>Tên loại <span class="hint">(người dân nhìn thấy)</span> *</label><input class="inp" id="tm-name" placeholder="vd: Văn bản QPPL"></div>
         <div class="fr full"><label>Mô tả</label><input class="inp" id="tm-desc"></div>
-        <div class="fr"><label>Kiểu gửi</label><div class="seg" id="tm-mode"><button class="on" data-v="broadcast">Broadcast</button><button data-v="personal">Cá nhân</button></div></div>
-        <div class="fr"><label>Tần suất mặc định</label><select class="sel" id="tm-freq"><option>Ngay</option><option>Hằng ngày</option><option>Hằng tuần</option></select></div>
-        <div class="fr"><label>Lọc theo lĩnh vực</label><label class="ck"><input type="checkbox" id="tm-field"> Cho người dân lọc lĩnh vực</label></div>
-        <div class="fr"><label>Người dân được tắt</label><div class="seg" id="tm-toggle"><button class="on" data-v="optional">Tuỳ chọn</button><button data-v="required">Bắt buộc</button></div></div>
+        <div class="fr full"><label>Lọc theo lĩnh vực</label><label class="ck"><input type="checkbox" id="tm-field"> Cho người dân lọc lĩnh vực</label></div>
         <div class="fr full"><label>Sự kiện thuộc loại <span class="hint">(1 loại gồm nhiều sự kiện kích hoạt)</span></label><div class="ev-list" id="tm-events"></div></div>
       </div>
     </div>
@@ -574,14 +571,12 @@
     el('c-types').textContent=types.length+' loại';
     el('tb-types').innerHTML=types.map(function(t){
       var evc=t.ev.length?'<span class="chip c-gray" title="'+t.ev.map(evLabel).join(', ')+'">'+t.ev.length+' sự kiện</span>':'<span class="chip c-gray" style="opacity:.55">chưa gán</span>';
-      var mode=t.mode==='broadcast'?'<span class="chip c-inapp">Broadcast</span>':'<span class="chip c-gray">Cá nhân</span>';
       var fld=t.field?'<span style="color:var(--success);font-weight:700">✓</span>':'<span style="color:var(--muted)">–</span>';
-      var tog=t.toggle==='required'?'<span class="chip c-push">Bắt buộc</span>':'<span class="chip c-gray">Tuỳ chọn</span>';
       return '<tr>'+
         '<td><span class="tag">'+t.c+'</span></td>'+
         '<td class="t-title">'+t.n+'</td>'+
-        '<td>'+evc+'</td><td>'+mode+'</td><td>'+fld+'</td><td>'+tog+'</td>'+
-        '<td>'+t.freq+'</td><td class="num">'+t.tpl+'</td>'+
+        '<td>'+evc+'</td><td>'+fld+'</td>'+
+        '<td class="num">'+t.tpl+'</td>'+
         '<td><span class="st '+(t.a?'ok':'mut')+'">'+(t.a?'Đang dùng':'Tạm ẩn')+'</span></td>'+
         '<td><div class="r-acts"><button title="Sửa" data-edit="'+t.c+'">✎</button><button title="Ẩn/hiện" data-toggle="'+t.c+'">◐</button></div></td></tr>';
     }).join('');
@@ -607,10 +602,7 @@
     el('tm-code').value=t?t.c:''; el('tm-code').readOnly=!!t; el('tm-code').style.opacity=t?'.6':'';
     el('tm-name').value=t?t.n:''; el('tm-desc').value=t&&t.d?t.d:'';
     el('tm-active').value=t?(t.a?'1':'0'):'1';
-    el('tm-freq').value=t?t.freq:'Ngay';
     el('tm-field').checked=t?!!t.field:false;
-    segSet('tm-mode',t?t.mode:'broadcast');
-    segSet('tm-toggle',t?t.toggle:'optional');
     renderEvChecklist(t?t.ev:[]);
     el('type-modal').classList.add('on');
   }
@@ -619,7 +611,7 @@
     var code=el('tm-code').value.trim(), name=el('tm-name').value.trim();
     if(!code||!name){alert('⚠️ Nhập Mã loại và Tên loại');return;}
     var ev=[].map.call(el('tm-events').querySelectorAll('input:checked'),function(i){return i.value;});
-    var d={c:code,n:name,d:el('tm-desc').value.trim(),mode:segVal('tm-mode'),field:el('tm-field').checked,toggle:segVal('tm-toggle'),freq:el('tm-freq').value,a:el('tm-active').value==='1',ev:ev};
+    var d={c:code,n:name,d:el('tm-desc').value.trim(),field:el('tm-field').checked,a:el('tm-active').value==='1',ev:ev};
     if(tmEditing){var i=types.map(function(x){return x.c;}).indexOf(tmEditing);d.tpl=types[i].tpl;types[i]=d;}
     else{ if(types.some(function(x){return x.c===code;})){alert('⚠️ Mã loại đã tồn tại');return;} d.tpl=0; types.push(d);}
     closeType(); renderTypes();
