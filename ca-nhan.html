@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cấu hình Thông báo cá nhân · Cổng Pháp luật Quốc gia</title>
+<style>
+  :root{
+    --bg:#eaf0f7; --surface:#ffffff; --surface-2:#f4f8fc; --surface-3:#e9f0f8;
+    --border:#dbe4ef; --border-strong:#c3d1e2;
+    --ink:#14243b; --ink-2:#42536b; --muted:#78889f;
+    --primary:#0b5cab; --primary-600:#094a8c; --primary-50:#e6f0fb;
+    --red:#c8102e;
+    --ok:#12855f; --ok-bg:#e2f4ec; --warn:#b9770a; --warn-bg:#fbf1dd; --danger:#d23b3b;
+    --shadow-sm:0 1px 2px rgba(16,38,66,.06); --shadow:0 10px 34px rgba(16,38,66,.14);
+    --r:10px; --r-lg:16px;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#0c1420; --surface:#131d2b; --surface-2:#182534; --surface-3:#1e2d40;
+      --border:#26374b; --border-strong:#38506b; --ink:#e8eef7; --ink-2:#aebccf; --muted:#7e8ea6;
+      --primary:#4f97e6; --primary-600:#65a6ec; --primary-50:#12243a; --red:#f26b7e;
+      --ok:#3fbf8f; --ok-bg:#122c25; --warn:#e0a536; --warn-bg:#33280f; --danger:#ef6a6a; --shadow:0 10px 34px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0c1420; --surface:#131d2b; --surface-2:#182534; --surface-3:#1e2d40;
+    --border:#26374b; --border-strong:#38506b; --ink:#e8eef7; --ink-2:#aebccf; --muted:#7e8ea6;
+    --primary:#4f97e6; --primary-600:#65a6ec; --primary-50:#12243a; --red:#f26b7e;
+    --ok:#3fbf8f; --ok-bg:#122c25; --warn:#e0a536; --warn-bg:#33280f; --danger:#ef6a6a; --shadow:0 10px 34px rgba(0,0,0,.5);
+  }
+  :root[data-theme="light"]{
+    --bg:#eaf0f7; --surface:#ffffff; --surface-2:#f4f8fc; --surface-3:#e9f0f8;
+    --border:#dbe4ef; --border-strong:#c3d1e2; --ink:#14243b; --ink-2:#42536b; --muted:#78889f;
+    --primary:#0b5cab; --primary-600:#094a8c; --primary-50:#e6f0fb; --red:#c8102e;
+    --ok:#12855f; --ok-bg:#e2f4ec; --warn:#b9770a; --warn-bg:#fbf1dd; --danger:#d23b3b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--sans);font-size:15px;line-height:1.55;color:var(--ink);background:var(--bg)}
+  button,input,select{font-family:inherit;font-size:inherit;color:inherit}
+  h1,h2{font-weight:700;letter-spacing:-.2px}
+
+  .top{background:var(--surface);border-bottom:3px solid var(--red);position:sticky;top:0;z-index:8;box-shadow:var(--shadow-sm)}
+  .top-in{max-width:980px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:12px}
+  .logo{width:40px;height:40px;border-radius:9px;background:linear-gradient(135deg,var(--red),#e0455c);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0}
+  .brand b{display:block;font-size:15px;color:var(--ink);line-height:1.2}
+  .brand span{font-size:12px;color:var(--muted)}
+  .top .spacer{flex:1}
+  .icon-btn{width:38px;height:38px;border:1px solid var(--border);background:var(--surface);border-radius:9px;cursor:pointer;color:var(--ink-2)}
+  .icon-btn:hover{background:var(--surface-2)}
+  .user{display:flex;align-items:center;gap:9px}
+  .ava{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#0b5cab,#4f97e6);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px}
+  .user small{font-size:12px;color:var(--muted);display:block}
+  .user b{font-size:13px}
+
+  .wrap{max-width:980px;margin:0 auto;padding:26px 20px 120px}
+  .crumb{font-size:13px;color:var(--muted);margin-bottom:14px}
+  .crumb b{color:var(--ink-2)}
+  h1{margin:0 0 6px;font-size:27px}
+  .lead{margin:0 0 20px;color:var(--ink-2);max-width:62ch}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);margin-bottom:18px}
+  .card-p{padding:20px 22px}
+  .sec-title{display:flex;align-items:center;gap:9px;margin:0 0 4px;font-size:17px}
+  .sec-title .ic{color:var(--primary)}
+  .sec-sub{margin:0 0 14px;color:var(--muted);font-size:13.5px}
+  .grid{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;align-items:start}
+
+  /* snooze */
+  .snooze{border:1px solid var(--border);border-left:4px solid var(--warn);border-radius:var(--r-lg);background:var(--surface);padding:18px 20px;display:flex;gap:14px;margin-bottom:18px;box-shadow:var(--shadow-sm)}
+  .snooze.on{background:var(--warn-bg)}
+  .snooze .bell{width:42px;height:42px;border-radius:11px;background:var(--warn-bg);color:var(--warn);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+  .snooze .body{flex:1}
+  .snooze b{font-size:15.5px}
+  .snooze p{margin:3px 0 0;color:var(--ink-2);font-size:13.5px}
+  .snooze-dur{margin-top:12px;display:none;gap:8px;flex-wrap:wrap}
+  .snooze.on .snooze-dur{display:flex}
+
+  /* switch */
+  .sw{position:relative;display:inline-flex;width:46px;height:26px;flex-shrink:0}
+  .sw input{opacity:0;width:0;height:0}
+  .sw .track{position:absolute;inset:0;background:var(--border-strong);border-radius:26px;transition:.2s;cursor:pointer}
+  .sw .track:before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+  .sw input:checked + .track{background:var(--primary)}
+  .sw input:checked + .track:before{transform:translateX(20px)}
+  .sw input:focus-visible + .track{outline:2px solid var(--primary);outline-offset:2px}
+  .sw input:disabled + .track{opacity:.55;cursor:not-allowed}
+
+  /* type rows */
+  .trow{border-bottom:1px solid var(--border);padding:13px 2px}
+  .trow:last-child{border-bottom:0}
+  .trow-main{display:flex;align-items:center;gap:14px}
+  .r-ic{width:38px;height:38px;border-radius:10px;background:var(--primary-50);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .r-body{flex:1;min-width:0}
+  .r-body b{font-size:14.5px;display:block}
+  .r-body span{font-size:12.5px;color:var(--muted)}
+  .lock{font-size:11px;color:var(--muted);background:var(--surface-3);padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .tagf{font-size:11px;color:var(--primary);background:var(--primary-50);padding:2px 8px;border-radius:20px;white-space:nowrap;font-weight:500}
+
+  /* per-type fields */
+  .trow-fields{margin:11px 0 2px 52px;padding:11px 13px;background:var(--surface-2);border:1px dashed var(--border-strong);border-radius:var(--r);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .trow-fields .lbl{font-size:12.5px;color:var(--ink-2);font-weight:600;margin-right:2px}
+  .fchip{display:inline-flex;align-items:center;gap:5px;background:var(--primary-50);color:var(--primary);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:500}
+  .none-txt{font-size:12.5px;color:var(--muted);font-style:italic}
+  .mini{border:1px solid var(--primary);color:var(--primary);background:var(--surface);border-radius:20px;padding:4px 12px;font-size:12.5px;cursor:pointer;font-weight:500;white-space:nowrap}
+  .mini:hover{background:var(--primary-50)}
+  .mini-sel{border:1px solid var(--border-strong);background:var(--surface);color:var(--ink);border-radius:8px;padding:5px 9px;font-size:12.5px;cursor:pointer}
+  .mini-sel:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-50)}
+
+  /* channels */
+  .row{display:flex;align-items:center;gap:14px;padding:12px 2px;border-bottom:1px solid var(--border)}
+  .row:last-child{border-bottom:0}
+
+  /* frequency */
+  .freq{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+  .freq label{display:block;border:1.5px solid var(--border);border-radius:var(--r);padding:12px;cursor:pointer;position:relative;background:var(--surface)}
+  .freq label:hover{border-color:var(--border-strong)}
+  .freq input{position:absolute;opacity:0}
+  .freq b{display:block;font-size:13.5px;margin-bottom:4px}
+  .freq span{font-size:11.5px;color:var(--muted);line-height:1.4}
+  .freq input:checked + b{color:var(--primary)}
+  .freq label:has(input:checked){border-color:var(--primary);background:var(--primary-50)}
+  .hint-note{font-size:12.5px;color:var(--muted);margin-top:10px}
+
+  /* quiet hours */
+  .qh{display:none;margin-top:14px;gap:12px;flex-wrap:wrap;align-items:flex-end}
+  .qh.on{display:flex}
+  .fld{display:flex;flex-direction:column;gap:5px}
+  .fld label{font-size:12.5px;color:var(--ink-2);font-weight:500}
+  .inp,select.inp{padding:9px 11px;border:1px solid var(--border-strong);border-radius:var(--r);background:var(--surface);min-width:118px}
+  .inp:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-50)}
+  .sec-flex{display:flex;align-items:center;justify-content:space-between;gap:12px}
+
+  /* action bar */
+  .actbar{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--border);box-shadow:0 -6px 20px rgba(16,38,66,.08);z-index:9}
+  .actbar-in{max-width:980px;margin:0 auto;padding:13px 20px;display:flex;align-items:center;gap:12px}
+  .btn{height:44px;padding:0 20px;border-radius:var(--r);border:1px solid transparent;cursor:pointer;font-weight:600;font-size:15px;display:inline-flex;align-items:center;gap:8px}
+  .btn-primary{background:var(--primary);color:#fff}
+  .btn-primary:hover{background:var(--primary-600)}
+  .btn-ghost{background:transparent;color:var(--ink-2);border-color:var(--border-strong)}
+  .btn-ghost:hover{background:var(--surface-2)}
+  .actbar .spacer{flex:1}
+  .saved-note{font-size:13px;color:var(--ok);display:none;align-items:center;gap:6px}
+  .saved-note.show{display:flex}
+
+  /* modal */
+  .mbg{position:fixed;inset:0;background:rgba(10,20,35,.5);display:none;align-items:center;justify-content:center;z-index:30;padding:22px}
+  .mbg.on{display:flex}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);width:100%;max-width:520px;max-height:88vh;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+  .m-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+  .m-head h2{margin:0;font-size:17px}
+  .m-head .mx{border:0;background:none;font-size:20px;cursor:pointer;color:var(--muted)}
+  .m-body{padding:16px 20px;overflow-y:auto}
+  .m-foot{padding:13px 20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .search{position:relative;margin-bottom:12px}
+  .search input{width:100%;padding:10px 12px 10px 34px;border:1px solid var(--border-strong);border-radius:var(--r);background:var(--surface)}
+  .search:before{content:"🔍";position:absolute;left:11px;top:50%;transform:translateY(-50%);opacity:.55;font-size:13px}
+  .flist{border:1px solid var(--border);border-radius:var(--r);max-height:300px;overflow-y:auto;background:var(--surface-2)}
+  .fitem{display:flex;align-items:center;gap:11px;padding:10px 13px;cursor:pointer;border-bottom:1px solid var(--border)}
+  .fitem:last-child{border-bottom:0}
+  .fitem:hover{background:var(--surface-3)}
+  .fitem input{width:19px;height:19px;accent-color:var(--primary);cursor:pointer}
+  .fitem span{font-size:14px}
+  .link{background:none;border:0;color:var(--primary);cursor:pointer;font-size:13px;font-weight:500;padding:0}
+  .link:hover{text-decoration:underline}
+
+  .toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:40;box-shadow:var(--shadow)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  @media (max-width:840px){.grid{grid-template-columns:1fr}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<header class="top"><div class="top-in">
+  <div class="logo">PL</div>
+  <div class="brand"><b>Cổng Pháp luật Quốc gia</b><span>Trang cá nhân</span></div>
+  <div class="spacer"></div>
+  <button class="icon-btn" id="theme" title="Giao diện sáng/tối">◑</button>
+  <div class="user"><div class="ava">NA</div><div><b>Nguyễn Văn A</b><small>Công dân</small></div></div>
+</div></header>
+
+<main class="wrap">
+  <div class="crumb"><b>Trang cá nhân</b> / Cấu hình thông báo</div>
+  <h1>Cấu hình thông báo cá nhân</h1>
+  <p class="lead">Tuỳ chỉnh loại thông báo, lĩnh vực quan tâm (riêng cho từng loại), kênh nhận và thời gian nhận.</p>
+
+  <!-- 217 -->
+  <div class="snooze" id="snooze">
+    <div class="bell">🔕</div>
+    <div class="body">
+      <div class="sec-flex"><b>Tạm dừng nhận thông báo</b>
+        <label class="sw"><input type="checkbox" id="snooze-tg"><span class="track"></span></label></div>
+      <p>Tạm thời ngừng nhận <strong>toàn bộ</strong> thông báo (Email · Push · In-app). Các cài đặt khác vẫn được giữ nguyên.</p>
+      <div class="snooze-dur">
+        <div class="fld"><label>Tạm dừng trong</label>
+          <select class="inp" id="snooze-dur"><option>1 giờ</option><option>Đến cuối ngày</option><option>3 ngày</option><option selected>7 ngày</option><option>Đến khi tôi bật lại</option></select></div>
+        <div class="fld"><label>&nbsp;</label><span style="font-size:12.5px;color:var(--ink-2)">Tự bật lại sau thời gian trên.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- LEFT: loại + lĩnh vực riêng -->
+    <div>
+      <div class="card"><div class="card-p">
+        <h2 class="sec-title"><span class="ic">🔔</span> Loại thông báo &amp; lĩnh vực</h2>
+        <p class="sec-sub">Bật loại bạn muốn nhận. Loại <b>theo lĩnh vực</b> cho phép chọn lĩnh vực riêng.</p>
+        <div id="types"></div>
+      </div></div>
+    </div>
+
+    <!-- RIGHT: kênh / tần suất / khung giờ -->
+    <div>
+      <div class="card"><div class="card-p">
+        <h2 class="sec-title"><span class="ic">📮</span> Kênh nhận</h2>
+        <p class="sec-sub">Phương thức nhận thông báo.</p>
+        <div id="channels"></div>
+      </div></div>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL: chọn lĩnh vực theo loại -->
+<div class="mbg" id="fmodal"><div class="modal">
+  <div class="m-head"><h2 id="fm-title">Lĩnh vực</h2><button class="mx" data-fclose>✕</button></div>
+  <div class="m-body">
+    <div class="search"><input type="text" id="fm-search" placeholder="Tìm…"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:13px">
+      <span>Đã chọn: <b id="fm-count" style="color:var(--primary)">0</b></span>
+      <span><button class="link" id="fm-all">Chọn tất cả</button> · <button class="link" id="fm-none">Bỏ chọn</button></span>
+    </div>
+    <div class="flist" id="fm-list"></div>
+  </div>
+  <div class="m-foot"><span style="font-size:12.5px;color:var(--muted)" id="fm-for"></span><button class="btn btn-primary" style="height:38px" data-fclose>Xong</button></div>
+</div></div>
+
+<div class="actbar"><div class="actbar-in">
+  <button class="btn btn-ghost" id="reset">↺ Khôi phục mặc định</button>
+  <span class="saved-note" id="saved">✓ Đã lưu thay đổi</span>
+  <div class="spacer"></div>
+  <button class="btn btn-primary" id="save">💾 Lưu cài đặt</button>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(id){return document.getElementById(id);};
+  $('theme').addEventListener('click',function(){var r=document.documentElement,c=r.getAttribute('data-theme');r.setAttribute('data-theme',c==='dark'?'light':c==='light'?'dark':(matchMedia('(prefers-color-scheme:dark)').matches?'light':'dark'));});
+
+  /* Tập lĩnh vực RIÊNG theo từng loại (khớp CMS: mỗi loại field có taxonomy riêng) */
+  var SETS={
+    legal:['Tài chính - Ngân hàng','Đất đai','Lao động & Việc làm','Bảo hiểm','Giáo dục','Y tế & Dược','Hành chính','Hình sự','Tố tụng & Thi hành án','Môi trường','Giao thông - Vận tải','Doanh nghiệp','Đầu tư','Thuế','Xây dựng','Hôn nhân & Gia đình','Dân sự'],
+    forum:['Cải cách hành chính','Chính sách kinh tế','An sinh xã hội','Chuyển đổi số','Môi trường & Khí hậu','Giáo dục & Đào tạo','Y tế cộng đồng'],
+    news:['Văn bản mới nổi bật','Chính sách sắp hiệu lực','Nghiên cứu - trao đổi','Hỏi đáp tiêu biểu','Sự kiện - hội thảo']
+  };
+  /* Loại thông báo — khớp danh mục CMS-544; loại có "set" = loại theo lĩnh vực */
+  var TYPES=[
+    {ic:'📄',n:'Văn bản QPPL',d:'Văn bản mới, sắp/hết hiệu lực',set:'legal',on:true,sel:['Tài chính - Ngân hàng','Đất đai'],freq:'Ngay lập tức'},
+    {ic:'📝',n:'Dự thảo văn bản',d:'Dự thảo mới & nhắc hạn góp ý',set:'legal',on:true,sel:['Đất đai'],freq:'Ngay lập tức'},
+    {ic:'💬',n:'Diễn đàn chính sách',d:'Phản hồi trong chủ đề bạn theo dõi',set:'forum',on:false,sel:[],freq:'Hàng ngày'},
+    {ic:'📰',n:'Bản tin định kỳ',d:'Tổng hợp tin theo chủ đề',set:'news',on:true,sel:['Văn bản mới nổi bật'],freq:'Hàng tuần'},
+    {ic:'❓',n:'Hỏi đáp pháp luật',d:'Câu hỏi của bạn được trả lời',on:true,freq:'Ngay lập tức'},
+    {ic:'📢',n:'Phản ánh - kiến nghị',d:'Cập nhật xử lý phản ánh của bạn',on:true,freq:'Ngay lập tức'},
+    {ic:'📊',n:'Khảo sát',d:'Mời tham gia khảo sát chính sách',on:false,freq:'Ngay lập tức'},
+    {ic:'🛠️',n:'Bảo trì hệ thống',d:'Thông báo bảo trì, gián đoạn dịch vụ',on:true,lock:true,freq:'Ngay lập tức'},
+    {ic:'🔐',n:'Bảo mật tài khoản',d:'Cảnh báo đăng nhập, đổi mật khẩu',on:true,lock:true,freq:'Ngay lập tức'}
+  ];
+
+  function fieldsRow(t,i){
+    if(!t.on) return '';
+    var fq = t.lock
+      ? '<span class="lbl">Tần suất:</span><span class="fchip">Ngay lập tức</span>'
+      : '<span class="lbl">Tần suất:</span><select class="mini-sel" data-freq="'+i+'"><option'+(t.freq==='Ngay lập tức'?' selected':'')+'>Ngay lập tức</option><option'+(t.freq==='Hàng ngày'?' selected':'')+'>Hàng ngày</option><option'+(t.freq==='Hàng tuần'?' selected':'')+'>Hàng tuần</option></select>';
+    var fld='';
+    if(t.set){
+      var chips=t.sel.length? t.sel.map(function(f){return '<span class="fchip">'+f+'</span>';}).join('') : '<span class="none-txt">mọi lĩnh vực</span>';
+      fld='<span class="lbl" style="margin-left:8px">Lĩnh vực:</span>'+chips+'<button class="mini" data-fld="'+i+'">'+(t.sel.length?'Sửa':'Chọn')+'</button>';
+    }
+    return '<div class="trow-fields">'+fq+fld+'</div>';
+  }
+  function renderTypes(){
+    $('types').innerHTML=TYPES.map(function(t,i){
+      return '<div class="trow"><div class="trow-main">'+
+        '<div class="r-ic">'+t.ic+'</div>'+
+        '<div class="r-body"><b>'+t.n+'</b><span>'+t.d+'</span></div>'+
+        (t.set?'<span class="tagf">theo lĩnh vực</span>':'')+
+        (t.lock?'<span class="lock">Bắt buộc</span>':'')+
+        '<label class="sw"><input type="checkbox" data-ti="'+i+'"'+(t.on?' checked':'')+(t.lock?' disabled':'')+'><span class="track"></span></label>'+
+        '</div>'+fieldsRow(t,i)+'</div>';
+    }).join('');
+  }
+  $('types').addEventListener('change',function(e){var cb=e.target.closest('[data-ti]');if(cb){TYPES[+cb.getAttribute('data-ti')].on=cb.checked;renderTypes();return;}var fq=e.target.closest('[data-freq]');if(fq)TYPES[+fq.getAttribute('data-freq')].freq=fq.value;});
+  $('types').addEventListener('click',function(e){var b=e.target.closest('[data-fld]');if(b)openF(+b.getAttribute('data-fld'));});
+
+  /* Kênh (214) */
+  var CH=[{ic:'📲',n:'In-app',d:'Hiển thị ngay trên Cổng',on:true},{ic:'📧',n:'Email',d:'Gửi tới hộp thư của bạn',on:true},{ic:'🖥️',n:'Push trình duyệt',d:'Thông báo đẩy trên trình duyệt (Chrome/Edge/Firefox)',on:false}];
+  function renderCh(){$('channels').innerHTML=CH.map(function(c,i){return '<div class="row"><div class="r-ic">'+c.ic+'</div><div class="r-body"><b>'+c.n+'</b><span>'+c.d+'</span></div><label class="sw"><input type="checkbox" data-ci="'+i+'"'+(c.on?' checked':'')+'><span class="track"></span></label></div>';}).join('');}
+  $('channels').addEventListener('change',function(e){var cb=e.target.closest('[data-ci]');if(cb)CH[+cb.getAttribute('data-ci')].on=cb.checked;});
+
+  /* Modal chọn lĩnh vực theo loại */
+  var curT=null;
+  function drawList(){
+    var t=TYPES[curT], list=SETS[t.set]||[], q=($('fm-search').value||'').toLowerCase();
+    var shown=list.filter(function(f){return f.toLowerCase().indexOf(q)>=0;});
+    $('fm-list').innerHTML=shown.map(function(f){return '<label class="fitem"><input type="checkbox" data-f="'+f+'"'+(t.sel.indexOf(f)>=0?' checked':'')+'><span>'+f+'</span></label>';}).join('') || '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">Không tìm thấy.</div>';
+    $('fm-count').textContent=t.sel.length;
+  }
+  function openF(i){curT=i;var t=TYPES[i];$('fm-title').textContent='Lĩnh vực · '+t.n;$('fm-for').textContent='Tập lĩnh vực riêng của loại này';$('fm-search').value='';drawList();$('fmodal').classList.add('on');}
+  function closeF(){$('fmodal').classList.remove('on');renderTypes();}
+  $('fm-search').addEventListener('input',drawList);
+  $('fm-list').addEventListener('change',function(e){var cb=e.target.closest('[data-f]');if(!cb)return;var t=TYPES[curT],f=cb.getAttribute('data-f');var k=t.sel.indexOf(f);if(cb.checked){if(k<0)t.sel.push(f);}else if(k>=0)t.sel.splice(k,1);$('fm-count').textContent=t.sel.length;});
+  $('fm-all').addEventListener('click',function(){var t=TYPES[curT];t.sel=(SETS[t.set]||[]).slice();drawList();});
+  $('fm-none').addEventListener('click',function(){TYPES[curT].sel=[];drawList();});
+  [].forEach.call(document.querySelectorAll('[data-fclose]'),function(b){b.addEventListener('click',closeF);});
+  $('fmodal').addEventListener('click',function(e){if(e.target===$('fmodal'))closeF();});
+
+  /* toggles */
+  $('snooze-tg').addEventListener('change',function(){$('snooze').classList.toggle('on',this.checked);});
+
+  /* toast + save/reset */
+  var tt;
+  function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('show');},2200);}
+  $('save').addEventListener('click',function(){toast('✓ Đã lưu cài đặt thông báo');var s=$('saved');s.classList.add('show');setTimeout(function(){s.classList.remove('show');},2600);});
+  $('reset').addEventListener('click',function(){
+    if(!confirm('Khôi phục toàn bộ cài đặt về mặc định?'))return;
+    TYPES[0].on=true;TYPES[0].sel=['Tài chính - Ngân hàng','Đất đai'];
+    TYPES[1].on=true;TYPES[1].sel=['Đất đai'];
+    TYPES[2].on=false;TYPES[2].sel=[];
+    TYPES[3].on=true;TYPES[3].sel=['Văn bản mới nổi bật'];
+    TYPES[4].on=true;TYPES[5].on=true;TYPES[6].on=false;TYPES[7].on=true;TYPES[8].on=true;
+    CH.forEach(function(c){c.on=c.n!=='Push trình duyệt';});
+    var df=['Ngay lập tức','Ngay lập tức','Hàng ngày','Hàng tuần','Ngay lập tức','Ngay lập tức','Ngay lập tức','Ngay lập tức','Ngay lập tức'];
+    TYPES.forEach(function(t,i){t.freq=df[i];});
+    $('snooze-tg').checked=false;$('snooze').classList.remove('on');
+    renderTypes();renderCh();toast('↺ Đã khôi phục mặc định');
+  });
+
+  renderTypes();renderCh();
+})();
+</script>
+
+</body>
+</html>
