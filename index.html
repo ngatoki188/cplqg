@@ -377,7 +377,7 @@
       <div class="ph"><div><h1 class="pt">Mẫu thông báo</h1><p class="ps">Nội dung mẫu riêng cho từng kênh (In-app · Email · Push) kèm biến động &amp; phiên bản</p></div><div class="acts"><button class="btn btn-p" id="btn-add-tpl">+ Tạo mẫu</button></div></div>
       <div class="callout warn"><span class="ci">⚠️</span><div><h4>Hiện trạng UAT</h4>Chỉ có <b>2 mẫu</b> trên tổng <b>15 loại</b> thông báo — cần bổ sung mẫu cho các loại còn lại trước nghiệm thu.</div></div>
       <div class="tw"><div class="tscroll"><table>
-        <thead><tr><th>Mã</th><th>Tên mẫu</th><th>Loại</th><th>Kênh có nội dung</th><th>Phiên bản</th><th>Trạng thái</th><th></th></tr></thead>
+        <thead><tr><th>Mã</th><th>Tên mẫu</th><th>Loại</th><th>Kênh có nội dung</th><th>Tần suất</th><th>Phiên bản</th><th>Trạng thái</th><th></th></tr></thead>
         <tbody id="tb-templates"></tbody>
       </table></div></div>
     </section>
@@ -462,7 +462,8 @@
         <div class="fr"><label>Mã mẫu *</label><input class="inp mono" id="tp-code" placeholder="vd: TPL-VB-002"></div>
         <div class="fr"><label>Trạng thái</label><select class="sel" id="tp-status"><option>Nháp</option><option>Chờ duyệt</option><option>Đã duyệt</option></select></div>
         <div class="fr full"><label>Tên mẫu *</label><input class="inp" id="tp-name" placeholder="vd: Văn bản mới ban hành"></div>
-        <div class="fr full"><label>Loại thông báo</label><select class="sel" id="tp-type"></select></div>
+        <div class="fr"><label>Loại thông báo</label><select class="sel" id="tp-type"></select></div>
+        <div class="fr"><label>Tần suất gửi mặc định</label><select class="sel" id="tp-freq"><option>Ngay lập tức</option><option>Hàng ngày</option><option>Hàng tuần</option><option>Hàng tháng</option></select></div>
         <div class="fr full"><label>Kênh có nội dung</label><div class="checks" id="tp-channels">
           <label class="ck"><input type="checkbox" value="in_app" checked> In-app</label>
           <label class="ck"><input type="checkbox" value="email" checked> Email</label>
@@ -643,14 +644,15 @@
   }
 
   var tpls=[
-    {c:'TPL-VB-001',n:'Văn bản mới ban hành',type:'legal_document',ch:['in_app','email','push'],v:'v3',st:'ok',stl:'Đã duyệt'},
-    {c:'TPL-DD-001',n:'Dự thảo mới lấy ý kiến',type:'draft_document',ch:['in_app','email','push','sms'],v:'v2',st:'ok',stl:'Đã duyệt'}
+    {c:'TPL-VB-001',n:'Văn bản mới ban hành',type:'legal_document',ch:['in_app','email','push'],v:'v3',st:'ok',stl:'Đã duyệt',freq:'Ngay lập tức'},
+    {c:'TPL-DD-001',n:'Dự thảo mới lấy ý kiến',type:'draft_document',ch:['in_app','email','push','sms'],v:'v2',st:'ok',stl:'Đã duyệt',freq:'Ngay lập tức'}
   ];
   function renderTpls(){
     el('tb-templates').innerHTML=tpls.map(function(t){
       return '<tr><td><span class="tag">'+t.c+'</span></td><td class="t-title">'+t.n+'</td>'+
         '<td><span class="chip c-gray">'+t.type+'</span></td>'+
         '<td><div style="display:flex;gap:3px;flex-wrap:wrap">'+chips(t.ch)+'</div></td>'+
+        '<td>'+(t.freq||'—')+'</td>'+
         '<td class="mono">'+t.v+'</td><td><span class="st '+t.st+'">'+t.stl+'</span></td>'+
         '<td><div class="r-acts"><button title="Sửa" data-tpedit="'+t.c+'">✎</button><button title="Xem trước">👁</button></div></td></tr>';
     }).join('');
@@ -894,6 +896,7 @@
     el('tp-type').innerHTML=types.map(function(x){return '<option value="'+x.c+'">'+x.n+' ('+x.c+')</option>';}).join('');
     if(t) el('tp-type').value=t.type;
     el('tp-status').value=t?t.stl:'Nháp';
+    el('tp-freq').value=t?(t.freq||'Ngay lập tức'):'Ngay lập tức';
     document.querySelectorAll('#tp-channels input').forEach(function(cb){cb.checked=t?(t.ch.indexOf(cb.value)>=0):(cb.value==='in_app'||cb.value==='email');});
     el('tp-vars').innerHTML=TPL_VARS.map(function(v){return '<button class="vchip" type="button">'+v+'</button>';}).join('');
     document.querySelectorAll('#tpl-modal [data-ed]').forEach(function(e){ if(e.isContentEditable)e.innerHTML=''; else e.value=''; });
@@ -906,7 +909,7 @@
     var ch=[].map.call(document.querySelectorAll('#tp-channels input:checked'),function(i){return i.value;});
     if(!ch.length){alert('⚠️ Chọn ít nhất 1 kênh có nội dung');return;}
     var st=el('tp-status').value, m={'Đã duyệt':'ok','Chờ duyệt':'warn','Nháp':'mut'};
-    var rec={c:code,n:name,type:el('tp-type').value,ch:ch,v:'v1',st:m[st]||'mut',stl:st};
+    var rec={c:code,n:name,type:el('tp-type').value,ch:ch,v:'v1',st:m[st]||'mut',stl:st,freq:el('tp-freq').value};
     var i=tpls.map(function(x){return x.c;}).indexOf(code);
     if(i>=0){rec.v=tpls[i].v; tpls[i]=rec;} else tpls.unshift(rec);
     closeTpl(); renderTpls();
