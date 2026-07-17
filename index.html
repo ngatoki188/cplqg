@@ -322,7 +322,7 @@
           <div class="panel"><div class="panel-h"><h3>Nội dung</h3><span class="tag">notifications</span></div><div class="panel-b">
             <div class="form">
               <div class="fr full"><label id="c-template-l">Mẫu áp dụng</label><select class="sel" id="c-template"><option>— Không dùng mẫu —</option><option>TPL-VB-001 · Văn bản mới ban hành</option><option>TPL-DD-001 · Dự thảo mới lấy ý kiến</option></select></div>
-              <div class="fr"><label>Loại thông báo *</label><select class="sel"><option>legal_document · Văn bản</option><option>draft_document · Dự thảo</option><option>qa_answer · Hỏi đáp</option><option>petition_update · Phản ánh</option><option>system · Hệ thống</option></select></div>
+              <div class="fr"><label>Loại thông báo</label><select class="sel" id="c-loai"></select></div>
               <div class="fr"><label>Mức ưu tiên</label><select class="sel"><option>Bình thường</option><option>Quan trọng</option><option>Khẩn</option></select></div>
               <div class="fr full"><label id="c-title-l">Tiêu đề *</label><input class="inp" id="c-title" value="Văn bản mới: Nghị định 280/2026/NĐ-CP về Bảo hiểm Tiền gửi"></div>
               <div class="fr full"><label>Nội dung * <span class="hint">(biến: {{user.full_name}}, {{document.title}}…)</span></label><textarea class="inp" id="c-content" rows="4">Xin chào {{user.full_name}}, văn bản {{document.title}} vừa ban hành thuộc lĩnh vực {{document.field}}, hiệu lực từ {{document.effective_date}}.</textarea></div>
@@ -748,7 +748,7 @@
       '<div class="fr"><label>Giờ gửi *</label><input class="inp" type="time" value="09:00"></div>'+
       '<div class="fr"><label>Múi giờ</label><select class="sel"><option>Việt Nam (UTC+7)</option><option>UTC</option></select></div>'+
       '<div class="fr"><label>Lặp lại</label><select class="sel"><option>Một lần</option><option>Hàng ngày</option><option>Hàng tuần</option><option>Hàng tháng</option></select></div>',
-    event:'<div class="fr full"><label>Sự kiện kích hoạt * <span class="hint">(nguồn dữ liệu &amp; biến của thông báo)</span></label><select class="sel"><option>document.created · Văn bản mới ban hành → {{document.*}}</option><option>document.effective_soon · Văn bản sắp có hiệu lực → {{document.*}}</option><option>draft.created · Dự thảo mới lấy ý kiến → {{draft.*}}</option><option>draft.deadline_near · Sắp hết hạn góp ý → {{draft.*}}</option><option>question.answered · Câu hỏi được trả lời → {{question.*}}</option><option>petition.resolved · Phản ánh được xử lý → {{petition.*}}</option><option>system.maintenance · Bảo trì hệ thống → {{maintenance.*}}</option></select></div>'+
+    event:'<div class="fr full"><label>Sự kiện kích hoạt * <span class="hint">(theo Loại thông báo đã chọn)</span></label><select class="sel" id="c-event"></select></div>'+
       '<div class="fr full"><label>Điều kiện lọc <span class="hint">(chỉ kích hoạt khi thỏa)</span></label><select class="sel"><option>Không lọc — mọi bản ghi</option><option>Lĩnh vực = Tài chính – Ngân hàng</option><option>Lĩnh vực = Đất đai</option><option>Cơ quan ban hành = Bộ Tư pháp</option><option>Loại văn bản = Nghị định</option></select></div>'+
       '<div class="fr"><label>Trễ sau kích hoạt</label><div style="display:flex;gap:6px"><input class="inp num" type="number" value="0" min="0" style="width:74px"><select class="sel" style="flex:1"><option>phút</option><option>giờ</option><option>ngày</option></select></div></div>'+
       '<div class="fr"><label>Chống trùng</label><select class="sel"><option>1 lần / người / sự kiện</option><option>Tối đa 1 lần / ngày</option><option>Không giới hạn</option></select></div>'+
@@ -764,6 +764,7 @@
   var pubLabel={now:'🚀 Gửi thông báo',sched:'📅 Lưu lịch gửi',event:'⚡ Kích hoạt trigger'};
   function renderPub(m){
     if(el('pubfields'))el('pubfields').innerHTML=pubFields[m]||pubFields.now;
+    if(m==='event')syncEventOptions();
     if(el('btn-pub-send'))el('btn-pub-send').textContent=pubLabel[m]||pubLabel.now;
     if(el('recipbox')){
       el('recipbox').innerHTML=recipBox.manual;
@@ -841,6 +842,23 @@
     if(e.target.id==='mf-search'){var q=e.target.value.toLowerCase();
       [].forEach.call(el('mf-people').querySelectorAll('.ev-i'),function(r){r.style.display=r.getAttribute('data-name').indexOf(q)>=0?'':'none';});}
   });
+
+  // Loại thông báo lái Mẫu & Sự kiện
+  function fillLoaiOptions(){ el('c-loai').innerHTML='<option value="">— Chọn loại (tuỳ chọn) —</option>'+types.map(function(t){return '<option value="'+t.c+'">'+t.c+' · '+t.n+'</option>';}).join(''); }
+  function syncTemplateOptions(){
+    var loai=el('c-loai').value, list=loai?tpls.filter(function(t){return t.type===loai;}):tpls;
+    el('c-template').innerHTML='<option value="">— Không dùng mẫu —</option>'+list.map(function(t){return '<option value="'+t.c+'">'+t.c+' · '+t.n+'</option>';}).join('');
+  }
+  function syncEventOptions(){
+    var sel=el('c-event'); if(!sel)return;
+    var loai=el('c-loai').value;
+    var ids=loai?(((types.filter(function(t){return t.c===loai;})[0])||{}).ev||[]):EVENTS.map(function(e){return e.id;});
+    if(!ids.length) ids=EVENTS.map(function(e){return e.id;});
+    sel.innerHTML=ids.map(function(id){var e=EVENTS.filter(function(x){return x.id===id;})[0];return '<option value="'+id+'">'+id+' · '+(e?e.label:id)+'</option>';}).join('');
+  }
+  el('c-loai').addEventListener('change',function(){syncTemplateOptions();syncEventOptions();});
+  fillLoaiOptions(); syncTemplateOptions();
+
   renderPub('now');
 
   /* ---------- CMS-545: Editor mẫu thông báo ---------- */
