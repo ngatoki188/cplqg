@@ -811,7 +811,7 @@
       '<div class="fr full"><div class="callout" style="margin:0;padding:11px 14px"><span class="ci">🔔</span><div><b>Nội dung lấy từ Mẫu</b> (cột trái — bắt buộc chọn). Biến trong mẫu được <b>điền tự động</b> từ dữ liệu bản ghi sinh ra sự kiện; người nhận xác định theo <b>quy tắc</b> bên dưới.</div></div></div>'
   };
   var recipBox={
-    manual:'<div class="fr full"><label>Đối tượng nhận</label><select class="sel" id="mf-aud"><option>Tất cả người dùng</option><option>Cá nhân (chọn người)</option><option>Theo lĩnh vực quan tâm</option><option>Theo vai trò</option><option>Theo hành vi (đã lưu văn bản / góp ý)</option><option>Nhóm tùy chỉnh</option></select></div>'+
+    manual:'<div class="fr full"><label>Đối tượng nhận</label><select class="sel" id="mf-aud"><option>Tất cả người dùng</option><option>Cá nhân (chọn người)</option><option>Lọc theo tiêu chí (vai trò · lĩnh vực · hành vi)</option></select></div>'+
       '<div class="fr full" id="mf-sub"></div>'+
       '<div class="fr full"><div class="callout" style="margin:0;padding:11px 14px"><span class="ci">👥</span><div>Ước tính <b class="num" id="mf-est">12.450</b> người nhận cho lần gửi này.</div></div></div>',
     event:'<div class="fr full"><label>Quy tắc người nhận <span class="hint">(tính động khi sự kiện xảy ra)</span></label><select class="sel"><option>Người đang theo dõi lĩnh vực của bản ghi</option><option>Người đang theo dõi cơ quan ban hành</option><option>Người đã lưu / xem bản ghi liên quan</option><option>Người đã góp ý dự thảo này</option><option>Tất cả người dùng</option></select></div>'+
@@ -862,28 +862,39 @@
   ];
   function mfRecalc(){
     var v=el('mf-aud').value;
+    if(v.indexOf('(động)')>=0){el('mf-est').textContent='~3.240';return;}
     if(v==='Tất cả người dùng'){el('mf-est').textContent='12.450';return;}
-    if(v==='Nhóm tùy chỉnh'){var s=el('mf-grp');if(s){el('mf-est').textContent=(parseInt(s.options[s.selectedIndex].getAttribute('data-size'),10)||0).toLocaleString('vi-VN');}return;}
-    var sum=[].reduce.call(el('mf-sub').querySelectorAll('input:checked'),function(a,c){return a+(parseInt(c.getAttribute('data-size'),10)||0);},0);
-    el('mf-est').textContent=(sum||0).toLocaleString('vi-VN');
+    if(v==='Cá nhân (chọn người)'){el('mf-est').textContent=String(el('mf-sub').querySelectorAll('input:checked').length);return;}
+    // Lọc theo tiêu chí: giao (AND) giữa các chiều đã chọn
+    var est=12450;
+    [].forEach.call(el('mf-sub').querySelectorAll('[data-dim]'),function(d){
+      var ck=d.querySelectorAll('input:checked'); if(!ck.length)return;
+      var s=0;[].forEach.call(ck,function(c){s+=parseInt(c.getAttribute('data-size'),10)||0;});
+      est=est*Math.min(1,s/12450);
+    });
+    el('mf-est').textContent=Math.round(est).toLocaleString('vi-VN');
   }
   function mfRenderSub(){
     var v=el('mf-aud').value, box=el('mf-sub');
     if(v.indexOf('(động)')>=0){box.innerHTML='<div class="callout" style="margin:0;padding:11px 14px"><span class="ci">🔔</span><div>Người nhận <b>tính động theo bản ghi</b> tại thời điểm sự kiện kích hoạt.</div></div>';el('mf-est').textContent='~3.240';return;}
     if(v==='Tất cả người dùng'){box.innerHTML='';el('mf-est').textContent='12.450';return;}
-    if(v==='Nhóm tùy chỉnh'){
-      box.innerHTML='<label>Nhóm đã lưu</label><select class="sel" id="mf-grp">'+groups.map(function(g){return '<option data-size="'+g.size+'">'+g.n+' ('+vn(g.size)+')</option>';}).join('')+'</select>';
-      mfRecalc();return;
-    }
     if(v==='Cá nhân (chọn người)'){
       box.innerHTML='<label>Chọn người nhận <span class="hint">(tìm &amp; tích chọn)</span></label>'+
         '<input class="inp" id="mf-search" placeholder="Tìm theo tên / email…" style="margin-bottom:8px">'+
         '<div class="ev-list" id="mf-people">'+PEOPLE.map(function(p){return '<label class="ev-i" data-name="'+(p.n+' '+p.e).toLowerCase()+'"><input type="checkbox" data-size="1"> '+p.n+' <span class="code">'+p.e+'</span></label>';}).join('')+'</div>';
       el('mf-est').textContent='0'; return;
     }
-    var cfg=mfSub[v]; if(!cfg){box.innerHTML='';return;}
-    box.innerHTML='<label>'+cfg.label+' <span class="hint">(chọn 1 hoặc nhiều)</span></label><div class="checks">'+cfg.opts.map(function(o,i){return '<label class="ck"><input type="checkbox" data-size="'+o[1]+'"'+(i===0?' checked':'')+'> '+o[0]+'</label>';}).join('')+'</div>';
-    mfRecalc();
+    if(v==='Lọc theo tiêu chí (vai trò · lĩnh vực · hành vi)'){
+      box.innerHTML=dimBlock('Vai trò',[['Người dân',8200],['Doanh nghiệp',3100],['Cộng tác viên',420]])
+        +dimBlock('Lĩnh vực',[['Tài chính – Ngân hàng',3240],['Đất đai',2100],['Lao động – BHXH',1560],['Giao thông',980]])
+        +dimBlock('Hành vi',[['Đã theo dõi lĩnh vực',2400],['Đã lưu văn bản 30 ngày',1800],['Đã góp ý dự thảo',1200]]);
+      mfRecalc(); return;
+    }
+    box.innerHTML='';
+  }
+  function dimBlock(t,opts){
+    return '<div data-dim style="margin-bottom:12px"><label style="display:block;margin-bottom:5px">'+t+' <span class="hint">(để trống = mọi '+t.toLowerCase()+')</span></label><div class="checks">'+
+      opts.map(function(o){return '<label class="ck"><input type="checkbox" data-size="'+o[1]+'"> '+o[0]+'</label>';}).join('')+'</div></div>';
   }
   el('recipbox').addEventListener('change',function(e){
     if(e.target.id==='mf-aud')mfRenderSub();
