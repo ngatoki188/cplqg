@@ -236,6 +236,11 @@
   .ev-g:first-child{margin-top:0}
   .ev-i{display:flex;align-items:center;gap:8px;padding:4px 2px;font-size:13px;cursor:pointer}
   .ev-i .code{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+  .cond-head{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-2);margin-bottom:8px;flex-wrap:wrap}
+  .cond-row{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+  .cond-row .sel{flex:1;min-width:0}
+  .cond-x{width:32px;height:34px;border:1px solid var(--border);background:var(--surface);border-radius:var(--r);cursor:pointer;color:var(--muted);flex-shrink:0}
+  .cond-x:hover{background:var(--danger-bg);color:var(--danger)}
 </style>
 </head>
 <body>
@@ -366,7 +371,7 @@
 
     <!-- VIEW: GROUPS -->
     <section class="view page" id="v-groups">
-      <div class="ph"><div><h1 class="pt">Nhóm &amp; đối tượng</h1><p class="ps">Phân khúc người nhận theo lĩnh vực, vai trò và hành vi để gửi hàng loạt</p></div><div class="acts"><button class="btn btn-p">+ Tạo nhóm</button></div></div>
+      <div class="ph"><div><h1 class="pt">Nhóm &amp; đối tượng</h1><p class="ps">Phân khúc người nhận theo lĩnh vực, vai trò và hành vi để gửi hàng loạt</p></div><div class="acts"><button class="btn btn-p" id="btn-add-seg">+ Tạo nhóm</button></div></div>
       <div class="callout"><span class="ci">💡</span><div><h4>Đề xuất bổ sung (từ phân tích UAT)</h4>Hiện <b>notification_group</b> mới là thư mục, chưa có bảng nhóm/segment thật &amp; targeting theo hành vi. Màn này là thiết kế đề xuất cho CMS-548.</div></div>
       <div class="tw"><div class="tscroll"><table>
         <thead><tr><th>Tên nhóm</th><th>Tiêu chí</th><th>Loại</th><th>Số người (ước tính)</th><th>Trạng thái</th><th></th></tr></thead>
@@ -445,6 +450,28 @@
       </div>
     </div>
     <div class="modal-f"><button class="btn btn-g" data-tmclose>Huỷ</button><button class="btn btn-p" id="tm-save">💾 Lưu</button></div>
+  </div>
+</div>
+
+<!-- MODAL: Tạo/Sửa nhóm đối tượng (CMS-548) -->
+<div class="modal-bg" id="seg-modal">
+  <div class="modal">
+    <div class="modal-h"><h3 id="sm-title">Tạo nhóm đối tượng</h3><button class="modal-x" data-smclose>✕</button></div>
+    <div class="modal-b">
+      <div class="form">
+        <div class="fr"><label>Tên nhóm *</label><input class="inp" id="sm-name" placeholder="vd: Quan tâm Đất đai"></div>
+        <div class="fr"><label>Loại nhóm</label><div class="seg" id="sm-kind"><button class="on" data-v="dynamic">Động</button><button data-v="static">Tĩnh</button></div></div>
+        <div class="fr full"><label>Mô tả</label><input class="inp" id="sm-desc"></div>
+        <div class="fr full">
+          <label>Điều kiện lọc <span class="hint">(Hồ sơ + Hành vi)</span></label>
+          <div class="cond-head">Khớp <select class="sel" id="sm-logic" style="width:auto;flex:none"><option value="all">TẤT CẢ</option><option value="any">BẤT KỲ</option></select> điều kiện sau:</div>
+          <div id="sm-conds"></div>
+          <button class="btn btn-g btn-sm" id="sm-add" style="margin-top:4px">+ Thêm điều kiện</button>
+        </div>
+        <div class="fr full"><div class="callout" style="margin:0;padding:11px 14px"><span class="ci">👥</span><div>Ước tính <b class="num" id="sm-est">12.450</b> người khớp nhóm này.</div></div></div>
+      </div>
+    </div>
+    <div class="modal-f"><button class="btn btn-g" data-smclose>Huỷ</button><button class="btn btn-p" id="sm-save">💾 Lưu nhóm</button></div>
   </div>
 </div>
 
@@ -635,7 +662,7 @@
       return '<tr><td class="t-title">'+g.n+'</td><td style="color:var(--text-2)">'+g.crit+'</td>'+
         '<td><span class="chip c-gray">'+g.type+'</span></td><td class="num">'+vn(g.size)+'</td>'+
         '<td><span class="st '+(g.a?'ok':'mut')+'">'+(g.a?'Đang dùng':'Nháp')+'</span></td>'+
-        '<td><div class="r-acts"><button title="Sửa">✎</button><button title="Gửi">📤</button></div></td></tr>';
+        '<td><div class="r-acts"><button title="Sửa" data-gedit="'+g.n+'">✎</button><button title="Gửi">📤</button></div></td></tr>';
     }).join('');
   }
 
@@ -781,7 +808,76 @@
   });
   renderPub('now');
 
-  renderList();renderTypes();renderTpls();renderGroups();renderChannels();renderDevs();renderDel();renderRec();renderStats();wireTypeModal();
+  /* ---------- CMS-548: Bộ tạo nhóm đối tượng ---------- */
+  var ATTRS=[
+    {id:'role',label:'Vai trò',group:'Hồ sơ',vals:['Người dân','Doanh nghiệp','Cộng tác viên']},
+    {id:'province',label:'Tỉnh/thành',group:'Hồ sơ',vals:['Hà Nội','TP. Hồ Chí Minh','Đà Nẵng','Tỉnh khác']},
+    {id:'org',label:'Loại tổ chức',group:'Hồ sơ',vals:['DN vừa và nhỏ','DN FDI','Tổ chức khác']},
+    {id:'field',label:'Lĩnh vực quan tâm',group:'Hồ sơ',vals:['Tài chính – Ngân hàng','Đất đai','Lao động – BHXH','Giao thông']},
+    {id:'lang',label:'Ngôn ngữ',group:'Hồ sơ',vals:['Tiếng Việt','English']},
+    {id:'saved',label:'Đã lưu văn bản',group:'Hành vi',vals:['Có','Không']},
+    {id:'feedback',label:'Đã góp ý dự thảo',group:'Hành vi',vals:['Có','Không']},
+    {id:'follow',label:'Đang theo dõi lĩnh vực',group:'Hành vi',vals:['Có','Không']},
+    {id:'asked',label:'Đã đặt câu hỏi',group:'Hành vi',vals:['Có','Không']},
+    {id:'active',label:'Hoạt động gần nhất',group:'Hành vi',vals:['Trong 7 ngày','Trong 30 ngày','Trên 90 ngày']}
+  ];
+  function attrOptions(sel){
+    var g={},order=[];ATTRS.forEach(function(a){if(!g[a.group]){g[a.group]=[];order.push(a.group);}g[a.group].push(a);});
+    return order.map(function(gr){return '<optgroup label="'+gr+'">'+g[gr].map(function(a){return '<option value="'+a.id+'"'+(a.id===sel?' selected':'')+'>'+a.label+'</option>';}).join('')+'</optgroup>';}).join('');
+  }
+  function valOptions(id){var a=ATTRS.filter(function(x){return x.id===id;})[0];return (a?a.vals:[]).map(function(v){return '<option>'+v+'</option>';}).join('');}
+  function condRow(attr){
+    attr=attr||ATTRS[0].id;
+    var d=document.createElement('div');d.className='cond-row';
+    d.innerHTML='<select class="sel attr">'+attrOptions(attr)+'</select>'+
+      '<select class="sel op" style="flex:none;width:104px"><option>là</option><option>không là</option></select>'+
+      '<select class="sel val">'+valOptions(attr)+'</select>'+
+      '<button class="cond-x" title="Xoá">✕</button>';
+    return d;
+  }
+  function segRecalc(){
+    var n=el('sm-conds').querySelectorAll('.cond-row').length, logic=el('sm-logic').value, base=12450, est;
+    if(n===0) est=base;
+    else if(logic==='all') est=Math.max(50,Math.round(base*Math.pow(0.5,n)));
+    else est=Math.max(50,Math.round(base*(1-Math.pow(0.6,n))));
+    el('sm-est').textContent=est.toLocaleString('vi-VN');
+  }
+  function openSeg(name){
+    el('sm-title').textContent=name?('Sửa nhóm: '+name):'Tạo nhóm đối tượng';
+    el('sm-name').value=name||''; el('sm-desc').value='';
+    segSet('sm-kind','dynamic'); el('sm-logic').value='all';
+    el('sm-conds').innerHTML=''; el('sm-conds').appendChild(condRow());
+    segRecalc(); el('seg-modal').classList.add('on');
+  }
+  function closeSeg(){el('seg-modal').classList.remove('on');}
+  function saveSeg(){
+    var name=el('sm-name').value.trim();
+    if(!name){alert('⚠️ Nhập tên nhóm');return;}
+    var rows=[].slice.call(el('sm-conds').querySelectorAll('.cond-row'));
+    var join=el('sm-logic').value==='all'?' VÀ ':' HOẶC ';
+    var crit=rows.map(function(r){
+      var a=ATTRS.filter(function(x){return x.id===r.querySelector('.attr').value;})[0];
+      return (a?a.label:'?')+' '+r.querySelector('.op').value+' '+r.querySelector('.val').value;
+    }).join(join)||'—';
+    groups.unshift({n:name,crit:crit,type:segVal('sm-kind')==='dynamic'?'Động':'Tĩnh',size:parseInt(el('sm-est').textContent.replace(/\D/g,''),10)||0,a:1});
+    closeSeg(); renderGroups();
+  }
+  function wireSeg(){
+    el('btn-add-seg').addEventListener('click',function(){openSeg(null);});
+    el('sm-add').addEventListener('click',function(){el('sm-conds').appendChild(condRow());segRecalc();});
+    el('sm-conds').addEventListener('click',function(e){var x=e.target.closest('.cond-x');if(x){x.closest('.cond-row').remove();segRecalc();}});
+    el('sm-conds').addEventListener('change',function(e){
+      if(e.target.classList.contains('attr')){e.target.closest('.cond-row').querySelector('.val').innerHTML=valOptions(e.target.value);}
+      segRecalc();
+    });
+    el('sm-logic').addEventListener('change',segRecalc);
+    el('sm-save').addEventListener('click',saveSeg);
+    [].forEach.call(document.querySelectorAll('[data-smclose]'),function(b){b.addEventListener('click',closeSeg);});
+    el('seg-modal').addEventListener('click',function(e){if(e.target===el('seg-modal'))closeSeg();});
+    el('tb-groups').addEventListener('click',function(e){var ed=e.target.closest('[data-gedit]');if(ed)openSeg(ed.getAttribute('data-gedit'));});
+  }
+
+  renderList();renderTypes();renderTpls();renderGroups();renderChannels();renderDevs();renderDel();renderRec();renderStats();wireTypeModal();wireSeg();
 })();
 </script>
 
