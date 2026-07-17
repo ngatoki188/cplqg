@@ -321,9 +321,9 @@
         <div>
           <div class="panel"><div class="panel-h"><h3>Nội dung</h3><span class="tag">notifications</span></div><div class="panel-b">
             <div class="form">
-              <div class="fr full"><label id="c-template-l">Mẫu áp dụng</label><select class="sel" id="c-template"><option>— Không dùng mẫu —</option><option>TPL-VB-001 · Văn bản mới ban hành</option><option>TPL-DD-001 · Dự thảo mới lấy ý kiến</option></select></div>
               <div class="fr"><label>Loại thông báo</label><select class="sel" id="c-loai"></select></div>
               <div class="fr"><label>Mức ưu tiên</label><select class="sel"><option>Bình thường</option><option>Quan trọng</option><option>Khẩn</option></select></div>
+              <div class="fr full"><label id="c-template-l">Mẫu áp dụng <span class="hint">(theo loại đã chọn)</span></label><select class="sel" id="c-template"><option>— Không dùng mẫu —</option></select></div>
               <div class="fr full"><label id="c-title-l">Tiêu đề *</label><input class="inp" id="c-title" value="Văn bản mới: Nghị định 280/2026/NĐ-CP về Bảo hiểm Tiền gửi"></div>
               <div class="fr full"><label>Nội dung * <span class="hint">(biến: {{user.full_name}}, {{document.title}}…)</span></label><textarea class="inp" id="c-content" rows="4">Xin chào {{user.full_name}}, văn bản {{document.title}} vừa ban hành thuộc lĩnh vực {{document.field}}, hiệu lực từ {{document.effective_date}}.</textarea></div>
               <div class="fr full"><label>Kênh gửi *</label><div class="checks">
@@ -779,7 +779,7 @@
     if(t){t.disabled=ev; t.style.opacity=ev?'.5':''; }
     if(c){c.disabled=ev; c.style.opacity=ev?'.5':''; }
     if(tpl)tpl.style.borderColor=ev?'var(--accent)':'';
-    if(el('c-template-l'))el('c-template-l').innerHTML=ev?'Mẫu áp dụng * <span class="hint">(nội dung &amp; biến lấy từ đây)</span>':'Mẫu áp dụng';
+    if(el('c-template-l'))el('c-template-l').innerHTML=ev?'Mẫu áp dụng * <span class="hint">(nội dung &amp; biến lấy từ đây)</span>':'Mẫu áp dụng <span class="hint">(theo loại đã chọn)</span>';
     if(el('c-title-l'))el('c-title-l').innerHTML=ev?'Tiêu đề <span class="hint">(tự tạo từ mẫu khi kích hoạt)</span>':'Tiêu đề *';
   }
   document.querySelectorAll('.seg').forEach(function(seg){
