@@ -332,7 +332,10 @@
               <div class="fr"><label>Mức ưu tiên</label><select class="sel"><option>Bình thường</option><option>Quan trọng</option><option>Khẩn</option></select></div>
               <div class="fr full"><label id="c-template-l">Mẫu áp dụng <span class="hint">(theo loại đã chọn)</span></label><select class="sel" id="c-template"><option>— Không dùng mẫu —</option></select></div>
               <div class="fr full"><label id="c-title-l">Tiêu đề *</label><input class="inp" id="c-title" value="Văn bản mới: Nghị định 280/2026/NĐ-CP về Bảo hiểm Tiền gửi"></div>
-              <div class="fr full"><label>Nội dung * <span class="hint">(biến: {{user.full_name}}, {{document.title}}…)</span></label><textarea class="inp" id="c-content" rows="4">Xin chào {{user.full_name}}, văn bản {{document.title}} vừa ban hành thuộc lĩnh vực {{document.field}}, hiệu lực từ {{document.effective_date}}.</textarea></div>
+              <div class="fr full"><label>Nội dung * <span class="hint">(biến: {{user.full_name}}, {{document.title}}…)</span></label>
+                <div class="rte-toolbar"><button type="button" data-cmd="bold" title="Đậm"><b>B</b></button><button type="button" data-cmd="italic" title="Nghiêng"><i>I</i></button><button type="button" data-cmd="underline" title="Gạch chân"><u>U</u></button><button type="button" data-cmd="insertUnorderedList" title="Danh sách">☰</button><button type="button" data-cmd="createLink" title="Chèn liên kết">🔗</button></div>
+                <div class="rte" contenteditable="true" id="c-content">Xin chào {{user.full_name}}, văn bản {{document.title}} vừa ban hành thuộc lĩnh vực {{document.field}}, hiệu lực từ {{document.effective_date}}.</div>
+              </div>
               <div class="fr full"><label>Kênh gửi *</label><div class="checks">
                 <label class="ck"><input type="checkbox" checked> In-app</label>
                 <label class="ck"><input type="checkbox" checked> Email</label>
@@ -791,7 +794,7 @@
     var ev=(m==='event');
     var t=el('c-title'),c=el('c-content'),tpl=el('c-template');
     if(t){t.disabled=ev; t.style.opacity=ev?'.5':''; }
-    if(c){c.disabled=ev; c.style.opacity=ev?'.5':''; }
+    if(c){c.contentEditable=ev?'false':'true'; c.style.opacity=ev?'.5':''; c.style.pointerEvents=ev?'none':''; var ctb=c.previousElementSibling; if(ctb&&ctb.classList.contains('rte-toolbar')){ctb.style.opacity=ev?'.4':''; ctb.style.pointerEvents=ev?'none':'';}}
     if(tpl)tpl.style.borderColor=ev?'var(--accent)':'';
     if(el('c-template-l'))el('c-template-l').innerHTML=ev?'Mẫu áp dụng * <span class="hint">(nội dung &amp; biến lấy từ đây)</span>':'Mẫu áp dụng <span class="hint">(theo loại đã chọn)</span>';
     if(el('c-title-l'))el('c-title-l').innerHTML=ev?'Tiêu đề <span class="hint">(tự tạo từ mẫu khi kích hoạt)</span>':'Tiêu đề *';
@@ -926,8 +929,11 @@
     [].forEach.call(document.querySelectorAll('[data-tpclose]'),function(b){b.addEventListener('click',closeTpl);});
     el('tpl-modal').addEventListener('click',function(e){if(e.target===el('tpl-modal'))closeTpl();});
     el('tb-templates').addEventListener('click',function(e){var ed=e.target.closest('[data-tpedit]');if(ed)openTpl(ed.getAttribute('data-tpedit'));});
-    // Thanh công cụ WYSIWYG (In-app / Email)
-    [].forEach.call(document.querySelectorAll('#tpl-modal .rte-toolbar'),function(tb){
+  }
+  // Thanh công cụ WYSIWYG dùng chung (mẫu + tạo thông báo)
+  function wireRTE(){
+    [].forEach.call(document.querySelectorAll('.rte-toolbar'),function(tb){
+      if(tb._wired)return; tb._wired=1;
       var rte=tb.nextElementSibling;
       [].forEach.call(tb.querySelectorAll('button'),function(bb){bb.addEventListener('mousedown',function(ev){ev.preventDefault();});});
       tb.addEventListener('click',function(ev){
@@ -939,7 +945,7 @@
     });
   }
 
-  renderList();renderTypes();renderTpls();renderChannels();renderDevs();renderDel();renderRec();renderStats();wireTypeModal();wireTpl();
+  renderList();renderTypes();renderTpls();renderChannels();renderDevs();renderDel();renderRec();renderStats();wireTypeModal();wireTpl();wireRTE();
 })();
 </script>
 
