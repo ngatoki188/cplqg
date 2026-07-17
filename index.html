@@ -821,8 +821,14 @@
   function renderPub(m){
     if(el('pubfields'))el('pubfields').innerHTML=pubFields[m]||pubFields.now;
     if(el('btn-pub-send'))el('btn-pub-send').textContent=pubLabel[m]||pubLabel.now;
-    if(el('recipbox'))el('recipbox').innerHTML=(m==='event')?recipBox.event:recipBox.manual;
-    if(m!=='event'&&el('mf-aud'))mfRenderSub();
+    if(el('recipbox')){
+      el('recipbox').innerHTML=recipBox.manual;
+      if(m==='event'){
+        el('mf-aud').insertAdjacentHTML('afterbegin','<option>Người theo dõi lĩnh vực của bản ghi (động)</option><option>Người đã lưu / theo dõi bản ghi liên quan (động)</option>');
+        el('mf-aud').selectedIndex=0;
+      }
+      mfRenderSub();
+    }
     // Sự kiện: nội dung do Mẫu sinh động → khoá nhập tay, Mẫu thành bắt buộc
     var ev=(m==='event');
     var t=el('c-title'),c=el('c-content'),tpl=el('c-template');
@@ -863,6 +869,7 @@
   }
   function mfRenderSub(){
     var v=el('mf-aud').value, box=el('mf-sub');
+    if(v.indexOf('(động)')>=0){box.innerHTML='<div class="callout" style="margin:0;padding:11px 14px"><span class="ci">🔔</span><div>Người nhận <b>tính động theo bản ghi</b> tại thời điểm sự kiện kích hoạt.</div></div>';el('mf-est').textContent='~3.240';return;}
     if(v==='Tất cả người dùng'){box.innerHTML='';el('mf-est').textContent='12.450';return;}
     if(v==='Nhóm tùy chỉnh'){
       box.innerHTML='<label>Nhóm đã lưu</label><select class="sel" id="mf-grp">'+groups.map(function(g){return '<option data-size="'+g.size+'">'+g.n+' ('+vn(g.size)+')</option>';}).join('')+'</select>';
