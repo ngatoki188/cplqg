@@ -490,6 +490,15 @@
   </div>
 </div>
 
+<!-- MODAL: Cấu hình kênh (CMS-549 Email / CMS-550 Push) -->
+<div class="modal-bg" id="chan-modal">
+  <div class="modal">
+    <div class="modal-h"><h3 id="cm-title">Cấu hình kênh</h3><button class="modal-x" data-cmclose>✕</button></div>
+    <div class="modal-b"><div class="form" id="cm-form"></div></div>
+    <div class="modal-f"><button class="btn btn-g" data-cmclose>Huỷ</button><button class="btn btn-s" id="cm-test">🧪 Kiểm tra</button><button class="btn btn-p" id="cm-save">💾 Lưu cấu hình</button></div>
+  </div>
+</div>
+
 <script>
 (function(){
   "use strict";
@@ -674,7 +683,7 @@
       return '<div class="cfg"><span class="cfg-badge st '+c.st+'">'+c.stl+'</span>'+
         '<div class="cfg-top"><div class="cfg-ic">'+c.ic+'</div><div><h3>'+c.n+'</h3><div class="prov">'+c.prov+'</div></div></div>'+
         '<div class="cfg-meta">'+c.meta.map(function(m){return '<div class="row"><span>'+m[0]+'</span><span class="num">'+m[1]+'</span></div>';}).join('')+'</div>'+
-        '<div class="acts" style="margin-top:13px"><button class="btn btn-s btn-sm">Cấu hình</button><button class="btn btn-g btn-sm">Kiểm tra</button></div></div>';
+        '<div class="acts" style="margin-top:13px"><button class="btn btn-s btn-sm" data-cfg="'+c.n+'">Cấu hình</button><button class="btn btn-g btn-sm" data-test="'+c.n+'">Kiểm tra</button></div></div>';
     }).join('');
   }
 
@@ -949,7 +958,36 @@
     });
   }
 
-  renderList();renderTypes();renderTpls();renderChannels();renderDevs();renderDel();renderRec();renderStats();wireTypeModal();wireTpl();wireRTE();
+  /* Cấu hình theo kênh (CMS-549 Email · CMS-550 Push · …) */
+  var CHAN_FIELDS={
+    'Email':[{g:'Máy chủ SMTP'},{l:'SMTP Host',v:'smtp.phapluat.gov.vn'},{l:'Cổng',v:'587'},{l:'Bảo mật',o:['STARTTLS (587)','SSL/TLS (465)','Không mã hoá']},{l:'Username',v:'no-reply@phapluat.gov.vn'},{l:'Password / App Password',v:'••••••••',p:1},{l:'Phương thức xác thực',o:['XOAuth2 (khuyến nghị)','LOGIN']},{g:'Người gửi & giới hạn'},{l:'Tên người gửi',v:'Cổng Pháp luật Quốc gia'},{l:'Email From',v:'no-reply@phapluat.gov.vn'},{l:'Reply-to',v:'support@phapluat.gov.vn'},{l:'BCC (ẩn)',v:''},{l:'Giới hạn /giờ',v:'1000'},{l:'Giới hạn /ngày',v:'5000'},{l:'Trạng thái',o:['Chưa kích hoạt','Đang hoạt động']}],
+    'Push':[{g:'FCM (Android)'},{l:'Project ID',v:''},{l:'Sender ID',v:''},{l:'Service Account JSON',v:'',p:1,full:1},{g:'APNs (iOS)'},{l:'Key ID',v:''},{l:'Team ID',v:''},{l:'Bundle ID',v:'vn.gov.phapluat.app'},{l:'Auth Key (.p8)',v:'',p:1,full:1},{l:'Môi trường',o:['Production','Sandbox (Dev)']},{g:'Khác'},{l:'Deep link khi nhấn',v:'plqg://notification/{{id}}',full:1},{l:'Trạng thái',o:['Cần cấu hình','Đang hoạt động']}],
+    'In-app':[{l:'Lưu lịch sử (ngày)',v:'90'},{l:'Trạng thái',o:['Đang hoạt động','Tạm dừng']}],
+    'SMS':[{l:'Brandname',v:'PLQG'},{l:'Nhà cung cấp',o:['VNPT SMS','Viettel','MobiFone']},{l:'Giới hạn ký tự',v:'160'},{l:'Trạng thái',o:['Tạm dừng','Đang hoạt động']}],
+    'Zalo OA':[{l:'OA ID',v:''},{l:'Access Token',v:'',p:1,full:1},{l:'Trạng thái',o:['Chưa cấu hình','Đang hoạt động']}],
+    'Webhook':[{l:'Endpoint URL',v:'https://…',full:1},{l:'Secret',v:'',p:1,full:1},{l:'Trạng thái',o:['Đang hoạt động','Tạm dừng']}]
+  };
+  var chanCur=null;
+  function renderChanForm(name){
+    el('cm-form').innerHTML=(CHAN_FIELDS[name]||[]).map(function(f){
+      if(f.g) return '<div class="fr full" style="margin-top:2px"><label style="color:var(--accent);font-weight:600;border-bottom:1px solid var(--border);padding-bottom:5px">'+f.g+'</label></div>';
+      var ctl=f.o?('<select class="sel">'+f.o.map(function(o){return '<option>'+o+'</option>';}).join('')+'</select>'):(f.p?'<input class="inp" type="password" value="'+f.v+'" placeholder="••••">':'<input class="inp" value="'+f.v+'">');
+      return '<div class="fr'+(f.full?' full':'')+'"><label>'+f.l+'</label>'+ctl+'</div>';
+    }).join('');
+  }
+  function openChan(name){ chanCur=name; el('cm-title').textContent='Cấu hình kênh · '+name; renderChanForm(name); el('chan-modal').classList.add('on'); }
+  function wireChan(){
+    el('cfg-grid').addEventListener('click',function(e){
+      var c=e.target.closest('[data-cfg]'); if(c){openChan(c.getAttribute('data-cfg'));return;}
+      var t=e.target.closest('[data-test]'); if(t)alert('🧪 Đang kiểm tra kết nối kênh '+t.getAttribute('data-test')+'…');
+    });
+    el('cm-test').addEventListener('click',function(){alert('🧪 Đang kiểm tra kết nối kênh '+(chanCur||'')+'…');});
+    el('cm-save').addEventListener('click',function(){el('chan-modal').classList.remove('on');alert('💾 Đã lưu cấu hình kênh '+(chanCur||'')+'!');});
+    [].forEach.call(document.querySelectorAll('[data-cmclose]'),function(b){b.addEventListener('click',function(){el('chan-modal').classList.remove('on');});});
+    el('chan-modal').addEventListener('click',function(e){if(e.target===el('chan-modal'))el('chan-modal').classList.remove('on');});
+  }
+
+  renderList();renderTypes();renderTpls();renderChannels();renderDevs();renderDel();renderRec();renderStats();wireTypeModal();wireTpl();wireRTE();wireChan();
 })();
 </script>
 
