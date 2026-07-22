@@ -298,19 +298,18 @@
     <!-- VIEW: LIST -->
     <section class="view on page" id="v-list">
       <div class="ph">
-        <div><h1 class="pt">Danh sách thông báo</h1><p class="ps">Tạo, lập lịch và theo dõi thông báo gửi tới người dùng Cổng Pháp luật Quốc gia</p></div>
+        <div><h1 class="pt">Danh sách thông báo</h1></div>
         <div class="acts">
-          <button class="btn btn-g">⬇ Xuất Excel</button>
           <button class="btn btn-p" data-go="compose">+ Tạo thông báo</button>
         </div>
       </div>
       <div class="kpis" id="k-list"></div>
       <div class="tb">
         <div class="tb-l">
+          <select class="sel" id="f-period"><option value="7">7 ngày gần nhất</option><option value="30">30 ngày</option><option value="90">90 ngày</option></select>
           <div class="search"><input placeholder="Tìm theo tiêu đề…"></div>
           <select class="sel"><option>Tất cả loại</option><option>Văn bản</option><option>Dự thảo</option><option>Hỏi đáp</option><option>Phản ánh</option><option>Hệ thống</option></select>
           <select class="sel"><option>Mọi trạng thái</option><option>Đã gửi</option><option>Đang gửi</option><option>Lên lịch</option><option>Nháp</option><option>Lỗi</option></select>
-          <select class="sel"><option>Mọi kênh</option><option>In-app</option><option>Email</option><option>Push</option><option>SMS</option></select>
         </div>
         <span class="count" id="c-list"></span>
       </div>
@@ -322,7 +321,7 @@
 
     <!-- VIEW: COMPOSE -->
     <section class="view page" id="v-compose">
-      <div class="ph"><div><h1 class="pt">Tạo &amp; gửi thông báo</h1><p class="ps">Thủ công · theo lịch · theo sự kiện nghiệp vụ — gửi theo nhóm, hồ sơ và hành vi</p></div></div>
+      <div class="ph"><div><h1 class="pt">Tạo &amp; gửi thông báo</h1></div></div>
       <div class="grid2">
         <div>
           <div class="panel"><div class="panel-h"><h3>Nội dung</h3><span class="tag">notifications</span></div><div class="panel-b">
@@ -339,7 +338,6 @@
                 <label class="ck"><input type="checkbox" checked> In-app</label>
                 <label class="ck"><input type="checkbox" checked> Email</label>
                 <label class="ck"><input type="checkbox"> Push</label>
-                <label class="ck"><input type="checkbox"> SMS</label>
               </div></div>
             </div>
           </div></div>
@@ -375,7 +373,6 @@
     <!-- VIEW: TEMPLATES -->
     <section class="view page" id="v-templates">
       <div class="ph"><div><h1 class="pt">Mẫu thông báo</h1><p class="ps">Nội dung mẫu riêng cho từng kênh (In-app · Email · Push) kèm biến động &amp; phiên bản</p></div><div class="acts"><button class="btn btn-p" id="btn-add-tpl">+ Tạo mẫu</button></div></div>
-      <div class="callout warn"><span class="ci">⚠️</span><div><h4>Hiện trạng UAT</h4>Chỉ có <b>2 mẫu</b> trên tổng <b>15 loại</b> thông báo — cần bổ sung mẫu cho các loại còn lại trước nghiệm thu.</div></div>
       <div class="tw"><div class="tscroll"><table>
         <thead><tr><th>Mã</th><th>Tên mẫu</th><th>Loại</th><th>Kênh có nội dung</th><th>Tần suất</th><th>Phiên bản</th><th>Trạng thái</th><th></th></tr></thead>
         <tbody id="tb-templates"></tbody>
@@ -460,7 +457,7 @@
     <div class="modal-b">
       <div class="form">
         <div class="fr"><label>Mã mẫu *</label><input class="inp mono" id="tp-code" placeholder="vd: TPL-VB-002"></div>
-        <div class="fr"><label>Trạng thái</label><select class="sel" id="tp-status"><option>Nháp</option><option>Chờ duyệt</option><option>Đã duyệt</option></select></div>
+        <div class="fr"><label>Trạng thái</label><select class="sel" id="tp-status"><option>Đang dùng</option><option>Đã ẩn</option></select></div>
         <div class="fr full"><label>Tên mẫu *</label><input class="inp" id="tp-name" placeholder="vd: Văn bản mới ban hành"></div>
         <div class="fr"><label>Loại thông báo</label><select class="sel" id="tp-type"></select></div>
         <div class="fr"><label>Tần suất gửi mặc định</label><select class="sel" id="tp-freq"><option>Ngay lập tức</option><option>Hàng ngày</option><option>Hàng tuần</option><option>Hàng tháng</option></select></div>
@@ -468,7 +465,6 @@
           <label class="ck"><input type="checkbox" value="in_app" checked> In-app</label>
           <label class="ck"><input type="checkbox" value="email" checked> Email</label>
           <label class="ck"><input type="checkbox" value="push"> Push</label>
-          <label class="ck"><input type="checkbox" value="sms"> SMS</label>
         </div></div>
         <div class="fr full"><label>Biến khả dụng <span class="hint">(bấm để chèn vào ô đang chọn)</span></label><div class="vchips" id="tp-vars"></div></div>
         <div class="fr full" id="tp-blk-in_app"><div class="tp-blk"><h5>📲 In-app</h5>
@@ -483,7 +479,6 @@
           <div class="rte-toolbar"><button type="button" data-cmd="bold" title="Đậm"><b>B</b></button><button type="button" data-cmd="italic" title="Nghiêng"><i>I</i></button><button type="button" data-cmd="underline" title="Gạch chân"><u>U</u></button><button type="button" data-cmd="insertUnorderedList" title="Danh sách">☰</button><button type="button" data-cmd="createLink" title="Chèn liên kết">🔗</button></div>
           <div class="rte" contenteditable="true" data-ed placeholder="Nội dung push…"></div>
         </div></div>
-        <div class="fr full" id="tp-blk-sms"><div class="tp-blk"><h5>💬 SMS</h5><textarea class="inp" rows="2" data-ed placeholder="Nội dung SMS…"></textarea><div class="hint" style="margin-top:4px">Giới hạn 160 ký tự · nên dùng biến rút gọn, không dấu</div></div></div>
       </div>
     </div>
     <div class="modal-f"><button class="btn btn-g" data-tpclose>Huỷ</button><button class="btn btn-p" id="tp-save">💾 Lưu mẫu</button></div>
@@ -503,7 +498,7 @@
 (function(){
   "use strict";
   var vn = function(n){ return n.toLocaleString('vi-VN'); };
-  var CH = {'in_app':['In-app','c-inapp'],'email':['Email','c-email'],'push':['Push','c-push'],'sms':['SMS','c-sms'],'zalo':['Zalo','c-zalo']};
+  var CH = {'in_app':['In-app','c-inapp'],'email':['Email','c-email'],'push':['Push','c-push'],'zalo':['Zalo','c-zalo']};
   function chips(arr){ return arr.map(function(c){var m=CH[c]||['?','c-gray'];return '<span class="chip '+m[1]+'">'+m[0]+'</span>';}).join(' '); }
   function el(id){ return document.getElementById(id); }
 
@@ -525,30 +520,29 @@
     r.setAttribute('data-theme',next);
   });
 
-  function kpi(l,v,d,cls,spark){
-    var s = spark? '<div class="spark">'+spark.map(function(x,i){return '<i class="'+(i===spark.length-1?'hl':'')+'" style="height:'+Math.round(x/Math.max.apply(null,spark)*100)+'%"></i>';}).join('')+'</div>':'';
-    return '<div class="kpi"><div class="l">'+l+'</div><div class="v num">'+v+'</div>'+(d?'<div class="d '+(cls||'')+'">'+d+'</div>':'')+s+'</div>';
+  function kpi(l,v,d,cls){
+    return '<div class="kpi"><div class="l">'+l+'</div><div class="v num">'+v+'</div>'+(d?'<div class="d '+(cls||'')+'">'+d+'</div>':'')+'</div>';
   }
 
   /* ---------- DATA (phản ánh mô hình thật; dữ liệu minh hoạ đã làm sạch) ---------- */
   var notifs=[
     {t:'Văn bản mới: Nghị định 280/2026/NĐ-CP về Bảo hiểm Tiền gửi',type:'Văn bản',ch:['in_app','email','push'],sc:'immediate',st:'ok',stl:'Đã gửi',rec:3240,sent:3240,op:2418,cl:1145,at:'13/07 09:15'},
-    {t:'Dự thảo Luật Đất đai sửa đổi — mời góp ý',type:'Dự thảo',ch:['in_app','email','push','sms'],sc:'immediate',st:'ok',stl:'Đã gửi',rec:12450,sent:12450,op:9230,cl:4120,at:'12/07 14:00'},
+    {t:'Dự thảo Luật Đất đai sửa đổi — mời góp ý',type:'Dự thảo',ch:['in_app','email','push'],sc:'immediate',st:'ok',stl:'Đã gửi',rec:12450,sent:12450,op:9230,cl:4120,at:'12/07 14:00'},
     {t:'Câu hỏi #QA-2024-1876 đã có câu trả lời từ chuyên gia',type:'Hỏi đáp',ch:['in_app','email'],sc:'event',st:'ok',stl:'Đã gửi',rec:1,sent:1,op:1,cl:1,at:'12/07 11:23'},
     {t:'Phản ánh #PA-00482 đã được xử lý',type:'Phản ánh',ch:['in_app','email'],sc:'event',st:'ok',stl:'Đã gửi',rec:1,sent:1,op:1,cl:1,at:'11/07 16:45'},
     {t:'Khảo sát: Mức độ hài lòng dịch vụ công 2026',type:'Khảo sát',ch:['in_app','email'],sc:'scheduled',st:'warn',stl:'Lên lịch',rec:5000,sent:0,op:0,cl:0,at:'20/07 08:00'},
-    {t:'Bảo trì hệ thống 02:00–04:00 ngày 15/07',type:'Hệ thống',ch:['in_app','push','sms'],sc:'scheduled',st:'warn',stl:'Lên lịch',rec:12450,sent:0,op:0,cl:0,at:'14/07 18:00'},
+    {t:'Bảo trì hệ thống 02:00–04:00 ngày 15/07',type:'Hệ thống',ch:['in_app','push'],sc:'scheduled',st:'warn',stl:'Lên lịch',rec:12450,sent:0,op:0,cl:0,at:'14/07 18:00'},
     {t:'Tin bài "Xây dựng Luật VBQPPL" đã được duyệt',type:'Tin bài',ch:['in_app','email'],sc:'event',st:'ok',stl:'Đã gửi',rec:1,sent:1,op:1,cl:0,at:'10/07 09:30'},
-    {t:'Nhắc lịch tư vấn với chuyên gia (16/07 14:00)',type:'Hỏi đáp',ch:['in_app','push','sms'],sc:'scheduled',st:'err',stl:'Lỗi',rec:1,sent:0,op:0,cl:0,at:'—'}
+    {t:'Nhắc lịch tư vấn với chuyên gia (16/07 14:00)',type:'Hỏi đáp',ch:['in_app','push'],sc:'scheduled',st:'err',stl:'Lỗi',rec:1,sent:0,op:0,cl:0,at:'—'}
   ];
   function renderList(){
     var tot=notifs.length, sentSum=notifs.reduce(function(s,n){return s+n.sent;},0);
     var opSum=notifs.reduce(function(s,n){return s+n.op;},0), sentRec=notifs.filter(function(n){return n.sent>0;}).reduce(function(s,n){return s+n.sent;},0);
     el('k-list').innerHTML=
-      kpi('Tổng thông báo','1.248','+12% so tháng trước','up',[42,58,67,51,89,102,124])+
-      kpi('Đã gửi hôm nay','87','+5%','up',[30,40,55,48,70,62,87])+
-      kpi('Tỷ lệ mở','68,4%','+2,1%','up')+
-      kpi('Tỷ lệ nhấp','32,7%','−0,8%','dn');
+      kpi('Tổng thông báo','1.248')+
+      kpi('Đã gửi hôm nay','87')+
+      kpi('Tỷ lệ mở','68,4%')+
+      kpi('Tỷ lệ nhấp','32,7%');
     el('c-list').textContent=tot+' bản ghi (hiển thị mẫu)';
     el('tb-list').innerHTML=notifs.map(function(n){
       var op=n.sent?Math.round(n.op/n.sent*100):0, ctr=n.sent?Math.round(n.cl/n.sent*100):0;
@@ -559,9 +553,8 @@
         '<td>'+scMap[n.sc]+'</td>'+
         '<td class="num">'+vn(n.rec)+'</td>'+
         '<td class="num"><b>'+vn(n.sent)+'</b></td>'+
-        '<td><span class="mut num" style="font-size:11px;color:var(--muted)">'+op+'% / '+ctr+'%</span></td>'+
-        '<td><span class="st '+n.st+'">'+n.stl+'</span></td>'+
-        '<td><div class="r-acts"><button title="Xem">👁</button><button title="Nhân bản">⧉</button></div></td></tr>';
+        '<td class="mut num" style="font-size:12px">'+op+' / '+ctr+'</td>'+
+        '<td><span class="st '+n.st+'">'+n.stl+'</span></td></tr>';
     }).join('');
   }
 
@@ -656,8 +649,8 @@
   }
 
   var tpls=[
-    {c:'TPL-VB-001',n:'Văn bản mới ban hành',type:'legal_document',ch:['in_app','email','push'],v:'v3',st:'ok',stl:'Đã duyệt',freq:'Ngay lập tức'},
-    {c:'TPL-DD-001',n:'Dự thảo mới lấy ý kiến',type:'draft_document',ch:['in_app','email','push','sms'],v:'v2',st:'ok',stl:'Đã duyệt',freq:'Ngay lập tức'}
+    {c:'TPL-VB-001',n:'Văn bản mới ban hành',type:'legal_document',ch:['in_app','email','push'],v:'v3',st:'ok',stl:'Đang dùng',freq:'Ngay lập tức'},
+    {c:'TPL-DD-001',n:'Dự thảo mới lấy ý kiến',type:'draft_document',ch:['in_app','email','push'],v:'v2',st:'ok',stl:'Đang dùng',freq:'Ngay lập tức'}
   ];
   function renderTpls(){
     el('tb-templates').innerHTML=tpls.map(function(t){
@@ -666,7 +659,7 @@
         '<td><div style="display:flex;gap:3px;flex-wrap:wrap">'+chips(t.ch)+'</div></td>'+
         '<td>'+(t.freq||'—')+'</td>'+
         '<td class="mono">'+t.v+'</td><td><span class="st '+t.st+'">'+t.stl+'</span></td>'+
-        '<td><div class="r-acts"><button title="Sửa" data-tpedit="'+t.c+'">✎</button><button title="Xem trước">👁</button></div></td></tr>';
+        '<td><div class="r-acts"><button title="Sửa" data-tpedit="'+t.c+'">✎</button><button title="Xóa" data-tpdel="'+t.c+'">🗑</button></div></td></tr>';
     }).join('');
   }
 
@@ -674,7 +667,6 @@
     {ic:'📧',n:'Email',prov:'SMTP · smtp.phapluat.gov.vn',st:'err',stl:'Chưa kích hoạt',meta:[['Người gửi','no-reply@phapluat.gov.vn'],['Giới hạn','1.000/giờ · 5.000/ngày'],['Hiện trạng UAT','đang dùng Gmail test']]},
     {ic:'📱',n:'Push',prov:'FCM (Android) + APNs (iOS)',st:'warn',stl:'Cần cấu hình',meta:[['Project ID','— chưa nhập —'],['APNs .p8','— chưa nhập —'],['Thiết bị đã đăng ký','4']]},
     {ic:'📲',n:'In-app',prov:'Hiển thị trực tiếp trên Cổng',st:'ok',stl:'Đang hoạt động',meta:[['Lưu lịch sử','90 ngày'],['Đã gửi','12.450']]},
-    {ic:'💬',n:'SMS',prov:'Brandname PLQG · VNPT SMS',st:'mut',stl:'Tạm dừng',meta:[['Giới hạn ký tự','160'],['Đã gửi','1.120']]},
     {ic:'🟦',n:'Zalo OA',prov:'Zalo Official Account',st:'mut',stl:'Chưa cấu hình',meta:[['Trạng thái','—']]},
     {ic:'🔗',n:'Webhook',prov:'Đẩy sự kiện ra hệ thống ngoài',st:'ok',stl:'Đang hoạt động',meta:[['Endpoint','3']]}
   ];
@@ -704,8 +696,6 @@
     {tm:'15/07 14:30',t:'Văn bản mới: NĐ 280/2026/NĐ-CP',ch:'email',tot:3240,ok:3180,f:12,st:'ok',stl:'Hoàn tất'},
     {tm:'15/07 14:30',t:'Văn bản mới: NĐ 280/2026/NĐ-CP',ch:'push',tot:2100,ok:1980,f:120,st:'err',stl:'Có lỗi'},
     {tm:'15/07 14:00',t:'Dự thảo Luật Đất đai sửa đổi',ch:'email',tot:12450,ok:8900,f:60,st:'warn',stl:'Đang gửi'},
-    {tm:'15/07 14:00',t:'Dự thảo Luật Đất đai sửa đổi',ch:'sms',tot:12450,ok:0,f:0,st:'mut',stl:'Chờ gửi'},
-    {tm:'14/07 18:00',t:'Bảo trì hệ thống 15/07',ch:'sms',tot:12450,ok:12100,f:350,st:'err',stl:'Có lỗi'},
     {tm:'11/07 16:45',t:'Phản ánh #PA-00482 đã xử lý',ch:'email',tot:1,ok:1,f:0,st:'ok',stl:'Hoàn tất'}
   ];
   function renderDel(){
@@ -758,7 +748,7 @@
     el('chart').innerHTML=vals.map(function(v,i){return '<div class="col"><div class="b" data-v="'+vn(v)+'" style="height:'+Math.round(v/mx*88)+'%"></div><div class="x">'+days[i]+'</div></div>';}).join('');
     el('donut').style.background='conic-gradient(var(--accent) 0 45%,var(--success) 45% 70%,var(--warning) 70% 85%,var(--info) 85% 100%)';
     el('legend').innerHTML=[['var(--accent)','Văn bản · 45%'],['var(--success)','Hỏi đáp · 25%'],['var(--warning)','Phản ánh · 15%'],['var(--info)','Khác · 15%']].map(function(x){return '<div><span class="dot" style="background:'+x[0]+'"></span>'+x[1]+'</div>';}).join('');
-    var scs=[['in_app',12450,9870,4560],['email',8230,5120,2140],['push',6540,4310,1980],['sms',1120,0,0]];
+    var scs=[['in_app',12450,9870,4560],['email',8230,5120,2140],['push',6540,4310,1980]];
     el('tb-stats').innerHTML=scs.map(function(s){
       var no=s[2]===0,or=s[1]?Math.round(s[2]/s[1]*100):0,ct=s[1]?Math.round(s[3]/s[1]*100):0;
       return '<tr><td>'+chips([s[0]])+'</td><td class="num">'+vn(s[1])+'</td><td class="num">'+(no?'–':vn(s[2]))+'</td>'+
@@ -894,7 +884,7 @@
   var TPL_VARS=['{{user.full_name}}','{{document.title}}','{{document.field}}','{{document.effective_date}}','{{document.url}}','{{system.name}}'];
   var tpFocus=null;
   function tpToggleBlocks(){
-    ['in_app','email','push','sms'].forEach(function(ch){
+    ['in_app','email','push'].forEach(function(ch){
       var cb=document.querySelector('#tp-channels input[value="'+ch+'"]'), blk=el('tp-blk-'+ch);
       if(blk) blk.style.display=(cb&&cb.checked)?'':'none';
     });
@@ -919,7 +909,7 @@
     if(!code||!name){alert('⚠️ Nhập Mã mẫu và Tên mẫu');return;}
     var ch=[].map.call(document.querySelectorAll('#tp-channels input:checked'),function(i){return i.value;});
     if(!ch.length){alert('⚠️ Chọn ít nhất 1 kênh có nội dung');return;}
-    var st=el('tp-status').value, m={'Đã duyệt':'ok','Chờ duyệt':'warn','Nháp':'mut'};
+    var st=el('tp-status').value, m={'Đang dùng':'ok','Đã ẩn':'mut'};
     var rec={c:code,n:name,type:el('tp-type').value,ch:ch,v:'v1',st:m[st]||'mut',stl:st,freq:el('tp-freq').value};
     var i=tpls.map(function(x){return x.c;}).indexOf(code);
     if(i>=0){rec.v=tpls[i].v; tpls[i]=rec;} else tpls.unshift(rec);
@@ -960,10 +950,9 @@
 
   /* Cấu hình theo kênh (CMS-549 Email · CMS-550 Push · …) */
   var CHAN_FIELDS={
-    'Email':[{g:'Máy chủ SMTP'},{l:'SMTP Host',v:'smtp.phapluat.gov.vn'},{l:'Cổng',v:'587'},{l:'Bảo mật',o:['STARTTLS (587)','SSL/TLS (465)','Không mã hoá']},{l:'Username',v:'no-reply@phapluat.gov.vn'},{l:'Password / App Password',v:'••••••••',p:1},{l:'Phương thức xác thực',o:['XOAuth2 (khuyến nghị)','LOGIN']},{g:'Người gửi & giới hạn'},{l:'Tên người gửi',v:'Cổng Pháp luật Quốc gia'},{l:'Email From',v:'no-reply@phapluat.gov.vn'},{l:'Reply-to',v:'support@phapluat.gov.vn'},{l:'BCC (ẩn)',v:''},{l:'Giới hạn /giờ',v:'1000'},{l:'Giới hạn /ngày',v:'5000'},{l:'Trạng thái',o:['Chưa kích hoạt','Đang hoạt động']}],
+    'Email':[{g:'Máy chủ SMTP'},{l:'SMTP Host',v:'smtp.phapluat.gov.vn'},{l:'Cổng',v:'587'},{l:'Bảo mật',o:['STARTTLS (587)','SSL/TLS (465)','Không mã hoá']},{l:'Username',v:'no-reply@phapluat.gov.vn'},{l:'Password / App Password',v:'••••••••',p:1},{l:'Phương thức xác thực',o:['XOAuth2 (khuyến nghị)','LOGIN']},{g:'Người gửi & giới hạn'},{l:'Tên người gửi',v:'Cổng Pháp luật Quốc gia'},{l:'Email From',v:'no-reply@phapluat.gov.vn'},{l:'Reply-to',v:'support@phapluat.gov.vn'},{l:'BCC (ẩn)',v:''},{l:'Giới hạn /giờ',v:'1000'},{l:'Giới hạn /ngày',v:'5000'},{l:'Trạng thái',o:['Chưa kích hoạt','Đang hoạt động']},{g:'Nội dung mặc định'},{l:'Tiền tố tiêu đề',v:'[Cổng PLQG] ',hint:'chèn trước tiêu đề mọi email'},{l:'Logo header (URL)',v:'https://phapluat.gov.vn/logo.png',full:1},{l:'Mẫu email mặc định',o:['— Không dùng —','Văn bản mới ban hành','Nhắc lịch','Thông báo hệ thống']},{l:'Chữ ký / Footer (HTML)',v:'Trân trọng,<br>Cổng Pháp luật Quốc gia',ta:1,full:1,hint:'hỗ trợ biến {{user.full_name}}…'},{l:'Địa chỉ người gửi',v:'Số 60 Trần Phú, Ba Đình, Hà Nội',full:1,hint:'bắt buộc để chống spam'},{l:'Link huỷ đăng ký',v:'https://phapluat.gov.vn/unsubscribe?token={{token}}',full:1}],
     'Push':[{g:'FCM (Android)'},{l:'Project ID',v:''},{l:'Sender ID',v:''},{l:'Service Account JSON',v:'',p:1,full:1},{g:'APNs (iOS)'},{l:'Key ID',v:''},{l:'Team ID',v:''},{l:'Bundle ID',v:'vn.gov.phapluat.app'},{l:'Auth Key (.p8)',v:'',p:1,full:1},{l:'Môi trường',o:['Production','Sandbox (Dev)']},{g:'Khác'},{l:'Deep link khi nhấn',v:'plqg://notification/{{id}}',full:1},{l:'Trạng thái',o:['Cần cấu hình','Đang hoạt động']}],
     'In-app':[{l:'Lưu lịch sử (ngày)',v:'90'},{l:'Trạng thái',o:['Đang hoạt động','Tạm dừng']}],
-    'SMS':[{l:'Brandname',v:'PLQG'},{l:'Nhà cung cấp',o:['VNPT SMS','Viettel','MobiFone']},{l:'Giới hạn ký tự',v:'160'},{l:'Trạng thái',o:['Tạm dừng','Đang hoạt động']}],
     'Zalo OA':[{l:'OA ID',v:''},{l:'Access Token',v:'',p:1,full:1},{l:'Trạng thái',o:['Chưa cấu hình','Đang hoạt động']}],
     'Webhook':[{l:'Endpoint URL',v:'https://…',full:1},{l:'Secret',v:'',p:1,full:1},{l:'Trạng thái',o:['Đang hoạt động','Tạm dừng']}]
   };
@@ -971,8 +960,10 @@
   function renderChanForm(name){
     el('cm-form').innerHTML=(CHAN_FIELDS[name]||[]).map(function(f){
       if(f.g) return '<div class="fr full" style="margin-top:2px"><label style="color:var(--accent);font-weight:600;border-bottom:1px solid var(--border);padding-bottom:5px">'+f.g+'</label></div>';
-      var ctl=f.o?('<select class="sel">'+f.o.map(function(o){return '<option>'+o+'</option>';}).join('')+'</select>'):(f.p?'<input class="inp" type="password" value="'+f.v+'" placeholder="••••">':'<input class="inp" value="'+f.v+'">');
-      return '<div class="fr'+(f.full?' full':'')+'"><label>'+f.l+'</label>'+ctl+'</div>';
+      var ctl=f.o?('<select class="sel">'+f.o.map(function(o){return '<option>'+o+'</option>';}).join('')+'</select>')
+        :f.ta?('<textarea class="inp" rows="3">'+f.v+'</textarea>')
+        :(f.p?'<input class="inp" type="password" value="'+f.v+'" placeholder="••••">':'<input class="inp" value="'+f.v+'">');
+      return '<div class="fr'+(f.full?' full':'')+'"><label>'+f.l+(f.hint?' <span class="hint">('+f.hint+')</span>':'')+'</label>'+ctl+'</div>';
     }).join('');
   }
   function openChan(name){ chanCur=name; el('cm-title').textContent='Cấu hình kênh · '+name; renderChanForm(name); el('chan-modal').classList.add('on'); }
