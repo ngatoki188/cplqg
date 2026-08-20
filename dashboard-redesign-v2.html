@@ -79,6 +79,11 @@
 #plqg-exec .pl-period{ display: flex; gap: 4px; flex-wrap: wrap; padding: 3px; border-radius: 9px; background: var(--panel); border: 1px solid var(--border); }
 #plqg-exec .pl-period button{ border: 0; background: transparent; padding: 7px 10px; border-radius: 7px; font-size: 12px; }
 #plqg-exec .pl-period button[aria-pressed=true]{ color: var(--invert-text); background: var(--invert-bg); }
+#plqg-exec .pl-data-refresh{ animation: pl-data-refresh .32s ease-out; }
+@keyframes pl-data-refresh{
+  from{ opacity: .45; transform: translateY(2px); }
+  to{ opacity: 1; transform: translateY(0); }
+}
 #plqg-exec .pl-notes-toggle{ display: flex; align-items: center; gap: 6px; padding: 7px 11px; border: 1px solid var(--border); border-radius: 8px; background: var(--panel); font-size: 12px; }
 #plqg-exec .pl-notes-toggle[aria-pressed=false]{ color: var(--muted); }
 
@@ -96,13 +101,27 @@
 #plqg-exec .pl-trend [data-lucide]{ width: 13px; height: 13px; }
 #plqg-exec .good{ color: var(--good-text); }
 #plqg-exec .warn{ color: light-dark(#b66d00, #ffd892); }
-/* A twelve-point sparkline turns each headline figure into a trend the leader
-   can read without opening a chart, which is what "so sánh được" means here. */
-#plqg-exec .pl-spark{ display: block; width: 100%; height: 38px; margin-top: 10px; }
-#plqg-exec .pl-spark path{ fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-#plqg-exec .pl-spark .spark-area{ fill: var(--accent-soft); stroke: none; }
-#plqg-exec .pl-spark.rising-bad path{ stroke: var(--warn); }
-#plqg-exec .pl-spark.rising-bad .spark-area{ fill: light-dark(#fdf1dc,#3a2d15); }
+#plqg-exec .down{ color: var(--brand); }
+/* A twelve-month line under each headline figure turns it into a trend the
+   leader can read without opening a chart, which is what "so sánh được" means
+   here. Uniform scaling keeps the month labels and the end dot undistorted. */
+#plqg-exec .pl-kpi-line{ display: block; width: 100%; height: auto; margin-top: 8px; overflow: visible; }
+#plqg-exec .pl-kpi-line path{ fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+/* Area under the line, generated from the line path so both stay in sync. */
+#plqg-exec .pl-kpi-line .line-area{ fill: url(#pl-line-fade); stroke: none; }
+#plqg-exec .pl-fade-top{ stop-color: var(--accent); stop-opacity: .3; }
+#plqg-exec .pl-fade-bottom{ stop-color: var(--accent); stop-opacity: 0; }
+#plqg-exec .pl-kpi-line .line-base{ stroke: var(--border-soft); stroke-width: 1; }
+#plqg-exec .pl-kpi-line .line-dot{ fill: var(--panel); stroke: var(--accent); stroke-width: 2; }
+#plqg-exec .pl-kpi-line text{ fill: var(--muted); font-size: 9px; }
+#plqg-exec .pl-kpi-line .axis-end{ text-anchor: end; }
+/* Grouped bars share the panel width with a line chart, so the month labels are
+   sized for that half-width column rather than for a full-width card. */
+#plqg-exec .pl-kpi-bars{ display: block; width: 100%; height: auto; margin-top: 10px; }
+#plqg-exec .pl-kpi-bars .bar-recv{ fill: var(--accent); }
+#plqg-exec .pl-kpi-bars .bar-done{ fill: var(--good); }
+#plqg-exec .pl-kpi-bars .bar-base{ stroke: var(--border-soft); stroke-width: 1; }
+#plqg-exec .pl-kpi-bars text{ fill: var(--muted); font-size: 7px; text-anchor: middle; }
 
 
 /* ============================================================
@@ -112,9 +131,21 @@
 #plqg-exec .pl-panel h2,#plqg-exec .pl-panel h4{ font-size: 15px; }
 #plqg-exec .pl-content-type{ display: flex; flex-direction: column; }
 #plqg-exec .pl-content-type > .pl-sub{ margin-bottom: 12px; }
-/* Two charts of the same kind sit side by side so they can be compared without
-   scrolling; align-items:start keeps the shorter one from stretching. */
-#plqg-exec .pl-chart-pair{ display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); align-items: start; gap: 14px; margin-bottom: 14px; }
+/* Panel title on the left, metric switch on the right. */
+#plqg-exec .pl-panel-head{ display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+#plqg-exec .pl-panel-head .pl-sub{ margin-top: 2px; }
+#plqg-exec .pl-toggle{ display: inline-flex; flex: none; gap: 2px; padding: 3px; border: 1px solid var(--border); border-radius: 9px; background: var(--neutral-bg); }
+#plqg-exec .pl-toggle button{ border: 0; background: transparent; padding: 6px 12px; border-radius: 7px; font-size: 12px; }
+#plqg-exec .pl-toggle button[aria-pressed=true]{ background: var(--panel); border: 1px solid var(--border); font-weight: 500; }
+/* News chart keeps the extra width; the action queue sits beside it. */
+#plqg-exec .pl-news-row{ grid-template-columns: minmax(0,1.7fr) minmax(280px,.95fr); }
+#plqg-exec .pl-news-trend{ min-width: 0; }
+/* Two charts of the same kind sit side by side so the same five legal domains
+   can be compared across metrics without scrolling. */
+#plqg-exec .pl-chart-pair{ display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; margin-bottom: 14px; }
+#plqg-exec .pl-chart-triple{ display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; margin-bottom: 14px; }
+/* Two panels stacked in one half of a pair row, splitting its height evenly. */
+#plqg-exec .pl-stack{ display: grid; grid-template-rows: repeat(2,minmax(0,1fr)); gap: 14px; }
 #plqg-exec .pl-srs{ color: var(--muted); font-size: 11px; white-space: nowrap; }
 
 /* One subsystem at a time: the active tab hides every [data-module] block that
@@ -174,17 +205,27 @@
 #plqg-exec .pl-donut-item strong{ font-weight: 500; font-variant-numeric: tabular-nums; }
 #plqg-exec .pl-donut-item em{ width: 44px; text-align: right; color: var(--muted); font-style: normal; font-variant-numeric: tabular-nums; }
 
-#plqg-exec .pl-mini-bars{ display: grid; gap: 8px; }
-#plqg-exec .pl-mini-bar{ display: grid; grid-template-columns: 130px 1fr 56px; align-items: center; gap: 7px; font-size: 11px; }
+/* The bar list absorbs the leftover height when the panel next to it is taller,
+   so paired panels stay the same size without a blank strip at the bottom. */
+#plqg-exec .pl-mini-bars{ display: grid; gap: 8px; flex: 1; align-content: space-between; }
+#plqg-exec .pl-mini-bar{ display: grid; grid-template-columns: 160px 1fr 56px; align-items: center; gap: 7px; font-size: 11px; }
+#plqg-exec .pl-mini-bar:has(em){ grid-template-columns: 160px 1fr 48px 52px; }
+#plqg-exec .pl-mini-bar > span{ min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #plqg-exec .pl-mini-track{ height: 8px; overflow: hidden; border-radius: 4px; background: var(--border-soft); }
 #plqg-exec .pl-mini-fill{ height: 100%; background: var(--accent); }
 #plqg-exec .pl-mini-bar strong{ text-align: right; font-variant-numeric: tabular-nums; }
+#plqg-exec .pl-mini-bar em{ text-align: right; color: var(--muted); font-style: normal; font-variant-numeric: tabular-nums; font-weight: 500; }
+/* Needs the element in the selector to outrank the plain .pl-mini-bar em colour. */
+#plqg-exec .pl-mini-bar em.good{ color: var(--good-text); }
+#plqg-exec .pl-mini-bar em.down{ color: var(--brand); }
 
 #plqg-exec .pl-line-chart{ width: 100%; height: auto; margin-top: 12px; }
 #plqg-exec .pl-line-chart .chart-grid{ stroke: light-dark(#e2e7ee,#303846); stroke-width: 1; }
-#plqg-exec .pl-line-chart .chart-line{ fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+#plqg-exec .pl-line-chart .chart-line{ fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 #plqg-exec .pl-line-chart .chart-line-2{ fill: none; stroke: var(--warn); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 #plqg-exec .pl-line-chart .chart-line-3{ fill: none; stroke: var(--good); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+#plqg-exec .pl-line-chart .chart-line-4{ fill: none; stroke: #9966cc; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+#plqg-exec .pl-line-chart .chart-line-5{ fill: none; stroke: #7d8da8; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 #plqg-exec .pl-line-chart .chart-dot{ fill: var(--panel); stroke: var(--accent); stroke-width: 2; }
 #plqg-exec .pl-line-chart text{ fill: var(--muted); font-size: 11px; }
 #plqg-exec .pl-line-chart .axis-x{ text-anchor: middle; }
@@ -206,11 +247,12 @@
    9. Action queue
    ============================================================ */
 #plqg-exec .pl-list{ margin-top: 10px; }
-/* Six rows down the full width would strand the numbers far from their labels. */
-#plqg-exec .pl-queue .pl-list{ display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 0 24px; }
+/* The queue shares its row with the two ranking panels, so it is a single column
+   that grows to the same height as the stack beside it. */
+#plqg-exec .pl-queue{ display: flex; flex-direction: column; }
+#plqg-exec .pl-queue .pl-list{ display: grid; flex: 1; align-content: space-between; }
 #plqg-exec .pl-row{ display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 9px; width: 100%; padding: 9px 4px; text-align: left; border: 0; border-bottom: 1px solid var(--border-soft); border-radius: 6px; background: transparent; }
 #plqg-exec .pl-row:last-child{ border-bottom: 0; }
-#plqg-exec .pl-queue .pl-row:nth-last-child(-n+3){ border-bottom: 0; }
 #plqg-exec .pl-row:hover{ background: var(--hover); }
 #plqg-exec .pl-row-icon{ width: 26px; height: 26px; display: grid; place-items: center; border-radius: 6px; background: var(--neutral-bg); }
 #plqg-exec .pl-row-label{ font-size: 12px; }
@@ -225,15 +267,17 @@
 /* ============================================================
    10. Responsive
    ============================================================ */
-@media (max-width: 1080px){
-  #plqg-exec .pl-metrics{ grid-template-columns: repeat(3,minmax(0,1fr)); }
+@media (max-width: 1180px){
+  /* Ranking panels are half-width, so give the bars room back from the labels. */
+  #plqg-exec .pl-mini-bar{ grid-template-columns: 128px 1fr 52px; }
+  #plqg-exec .pl-mini-bar:has(em){ grid-template-columns: 128px 1fr 44px 48px; }
 }
 @media (max-width: 860px){
-  #plqg-exec .pl-chart-pair{ grid-template-columns: 1fr; }
+  #plqg-exec .pl-chart-pair,
+  #plqg-exec .pl-chart-triple,
+  #plqg-exec .pl-news-row{ grid-template-columns: 1fr; }
   #plqg-exec .pl-modules > .pl-chart-half{ grid-column: 1/-1; }
-  #plqg-exec .pl-queue .pl-list{ grid-template-columns: 1fr; gap: 0; }
-  #plqg-exec .pl-queue .pl-row:nth-last-child(-n+3){ border-bottom: 1px solid var(--border-soft); }
-  #plqg-exec .pl-queue .pl-row:last-child{ border-bottom: 0; }
+  #plqg-exec .pl-stack{ grid-template-rows: none; }
 }
 @media (max-width: 800px){
   #plqg-exec .pl-top{ flex-wrap: wrap; }
@@ -247,6 +291,7 @@
   #plqg-exec .pl-metrics{ grid-template-columns: 1fr; }
   #plqg-exec .pl-type-kpis{ grid-template-columns: repeat(2,minmax(0,1fr)); }
   #plqg-exec .pl-mini-bar{ grid-template-columns: 110px 1fr 50px; }
+  #plqg-exec .pl-mini-bar:has(em){ grid-template-columns: 100px 1fr 44px 44px; }
   #plqg-exec .pl-funnel-step{ grid-template-columns: 78px 1fr 56px; }
   #plqg-exec .pl-funnel-rate{ display: none; }
   #plqg-exec .pl-donut-wrap{ flex-direction: column; align-items: flex-start; gap: 14px; }
@@ -288,6 +333,16 @@
 
 <div class="pl-body">
 
+<!-- Gradient dùng chung cho phần tô mờ dưới các đường KPI -->
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+  <defs>
+    <linearGradient id="pl-line-fade" x1="0" y1="0" x2="0" y2="1">
+      <stop class="pl-fade-top" offset="0"/>
+      <stop class="pl-fade-bottom" offset="1"/>
+    </linearGradient>
+  </defs>
+</svg>
+
 <div class="pl-toolbar">
   <div class="pl-toolbar-left">
     <button class="pl-notes-toggle" type="button" id="pl-notes" aria-pressed="false"><i data-lucide="lightbulb"></i>Ghi chú thiết kế</button>
@@ -307,151 +362,225 @@
     <div class="pl-metric-head"><span>Người dùng cổng</span><i data-lucide="users"></i></div>
     <div class="pl-value">128.450</div>
     <div class="pl-meta"><span class="pl-trend good" title="So với kỳ trước" aria-label="tăng 3,5% so với kỳ trước"><i data-lucide="trending-up"></i>+3,5%</span> · kỳ trước 124.100</div>
-    <svg class="pl-spark" viewBox="0 0 120 38" preserveAspectRatio="none" role="img" aria-label="Số người dùng tăng liên tục 12 tháng, từ 96 nghìn lên 128 nghìn">
-      <path class="spark-area" d="M0 30 L11 28 L22 25 L33 23 L44 20 L55 18 L65 15 L76 12 L87 10 L98 8 L109 6 L120 4 L120 38 L0 38 Z"/>
-      <path d="M0 30 L11 28 L22 25 L33 23 L44 20 L55 18 L65 15 L76 12 L87 10 L98 8 L109 6 L120 4"/>
+    <svg class="pl-kpi-line" viewBox="0 0 320 56" role="img" aria-label="Số người dùng tăng liên tục 12 tháng, từ 96 nghìn lên 128 nghìn">
+      <line class="line-base" x1="6" y1="38" x2="314" y2="38"/>
+      <path d="M6 30 L34 28 L62 25 L90 23 L118 20 L146 18 L174 15 L202 12 L230 10 L258 8 L286 6 L314 4"/>
+      <circle class="line-dot" cx="314" cy="4" r="3"/>
+      <text x="6" y="52">T9/2025</text>
+      <text class="axis-end" x="314" y="52">T8/2026</text>
     </svg>
   </button>
   <button class="pl-metric" type="button">
-    <div class="pl-metric-head"><span>Vụ việc trợ giúp pháp lý</span><i data-lucide="scale"></i></div>
-    <div class="pl-value">42.896</div>
-    <div class="pl-meta"><span class="pl-trend good" title="So với kỳ trước" aria-label="tăng 8,1% so với kỳ trước"><i data-lucide="trending-up"></i>+8,1%</span> · kỳ trước 39.682</div>
-    <svg class="pl-spark" viewBox="0 0 120 38" preserveAspectRatio="none" role="img" aria-label="Số vụ việc trợ giúp pháp lý tăng dần trong 12 tháng, từ 31 nghìn lên gần 43 nghìn">
-      <path class="spark-area" d="M0 30 L11 26 L22 23 L33 19 L44 21 L55 17 L65 15 L76 13 L87 10 L98 8 L109 6 L120 4 L120 38 L0 38 Z"/>
-      <path d="M0 30 L11 26 L22 23 L33 19 L44 21 L55 17 L65 15 L76 13 L87 10 L98 8 L109 6 L120 4"/>
+    <div class="pl-metric-head"><span>Tin bài đã xuất bản</span><i data-lucide="newspaper"></i></div>
+    <div class="pl-value">2.565</div>
+    <div class="pl-meta"><span class="pl-trend good" title="So với kỳ trước" aria-label="tăng 6,4% so với kỳ trước"><i data-lucide="trending-up"></i>+6,4%</span> · kỳ trước 2.410</div>
+    <svg class="pl-kpi-line" viewBox="0 0 320 56" role="img" aria-label="Số tin bài đã xuất bản tăng dần 12 tháng, từ 1.820 lên 2.565">
+      <line class="line-base" x1="6" y1="38" x2="314" y2="38"/>
+      <path d="M6 30 L34 28 L62 26 L90 23 L118 21 L146 19 L174 16 L202 14 L230 11 L258 8 L286 6 L314 4"/>
+      <circle class="line-dot" cx="314" cy="4" r="3"/>
+      <text x="6" y="52">T9/2025</text>
+      <text class="axis-end" x="314" y="52">T8/2026</text>
     </svg>
   </button>
   <button class="pl-metric" type="button">
-    <div class="pl-metric-head"><span>Câu hỏi người dân gửi</span><i data-lucide="message-circle-question"></i></div>
-    <div class="pl-value">2.460</div>
-    <div class="pl-meta"><span class="pl-trend good" title="So với kỳ trước" aria-label="tăng 11,2% so với kỳ trước"><i data-lucide="trending-up"></i>+11,2%</span> · kỳ trước 2.212</div>
-    <svg class="pl-spark" viewBox="0 0 120 38" preserveAspectRatio="none" role="img" aria-label="Số câu hỏi người dân gửi tăng đều 12 tháng, từ 1.620 lên 2.460">
-      <path class="spark-area" d="M0 30 L11 26 L22 24 L33 21 L44 18 L55 15 L65 13 L76 11 L87 9 L98 7 L109 5 L120 4 L120 38 L0 38 Z"/>
-      <path d="M0 30 L11 26 L22 24 L33 21 L44 18 L55 15 L65 13 L76 11 L87 9 L98 7 L109 5 L120 4"/>
+    <div class="pl-metric-head"><span>Diễn đàn</span><i data-lucide="messages-square"></i></div>
+    <div class="pl-value">29</div>
+    <div class="pl-meta"><span class="pl-trend good" title="So với kỳ trước" aria-label="tăng 16,0% so với kỳ trước"><i data-lucide="trending-up"></i>+16,0%</span> · kỳ trước 25 · 125 bình luận</div>
+    <svg class="pl-kpi-line" viewBox="0 0 320 56" role="img" aria-label="Số chủ đề diễn đàn tăng dần 12 tháng, từ 12 lên 29">
+      <line class="line-base" x1="6" y1="38" x2="314" y2="38"/>
+      <path d="M6 30 L34 27 L62 25 L90 22 L118 21 L146 18 L174 16 L202 15 L230 12 L258 10 L286 7 L314 4"/>
+      <circle class="line-dot" cx="314" cy="4" r="3"/>
+      <text x="6" y="52">T9/2025</text>
+      <text class="axis-end" x="314" y="52">T8/2026</text>
     </svg>
   </button>
   <button class="pl-metric" type="button">
-    <div class="pl-metric-head"><span>Tỷ lệ trả lời câu hỏi</span><i data-lucide="circle-check-big"></i></div>
-    <div class="pl-value">86,4%</div>
-    <div class="pl-meta"><span class="pl-trend good" title="So với kỳ trước" aria-label="tăng 2,1 điểm phần trăm so với kỳ trước"><i data-lucide="trending-up"></i>+2,1 điểm</span> · kỳ trước 84,3%</div>
-    <svg class="pl-spark" viewBox="0 0 120 38" preserveAspectRatio="none" role="img" aria-label="Tỷ lệ trả lời dao động quanh 80 đến 86 phần trăm và nhích lên trong 12 tháng">
-      <path class="spark-area" d="M0 30 L11 27 L22 23 L33 27 L44 20 L55 16 L65 20 L76 13 L87 9 L98 13 L109 6 L120 4 L120 38 L0 38 Z"/>
-      <path d="M0 30 L11 27 L22 23 L33 27 L44 20 L55 16 L65 20 L76 13 L87 9 L98 13 L109 6 L120 4"/>
-    </svg>
-  </button>
-  <button class="pl-metric" type="button">
-    <div class="pl-metric-head"><span>Văn bản mới trong kỳ</span><i data-lucide="landmark"></i></div>
+    <div class="pl-metric-head"><span>Văn bản quy phạm pháp luật</span><i data-lucide="landmark"></i></div>
     <div class="pl-value">8.919</div>
     <div class="pl-meta"><span class="pl-trend warn" title="So với kỳ trước" aria-label="giảm 2,3% so với kỳ trước"><i data-lucide="trending-down"></i>-2,3%</span> · kỳ trước 9.129</div>
-    <svg class="pl-spark" viewBox="0 0 120 38" preserveAspectRatio="none" role="img" aria-label="Số văn bản mới tăng suốt 10 tháng rồi giảm nhẹ hai tháng gần đây">
-      <path class="spark-area" d="M0 30 L11 25 L22 21 L33 17 L44 19 L55 13 L65 11 L76 9 L87 6 L98 4 L109 7 L120 10 L120 38 L0 38 Z"/>
-      <path d="M0 30 L11 25 L22 21 L33 17 L44 19 L55 13 L65 11 L76 9 L87 6 L98 4 L109 7 L120 10"/>
+    <svg class="pl-kpi-line" viewBox="0 0 320 56" role="img" aria-label="Số văn bản mới tăng suốt 10 tháng rồi giảm nhẹ hai tháng gần đây">
+      <line class="line-base" x1="6" y1="38" x2="314" y2="38"/>
+      <path d="M6 30 L34 25 L62 21 L90 17 L118 19 L146 13 L174 11 L202 9 L230 6 L258 4 L286 7 L314 10"/>
+      <circle class="line-dot" cx="314" cy="10" r="3"/>
+      <text x="6" y="52">T9/2025</text>
+      <text class="axis-end" x="314" y="52">T8/2026</text>
     </svg>
   </button>
   <button class="pl-metric" type="button">
-    <div class="pl-metric-head"><span>Tồn đọng chờ duyệt</span><i data-lucide="file-clock"></i></div>
-    <div class="pl-value warn">166</div>
-    <div class="pl-meta"><span class="pl-trend warn" title="So với kỳ trước" aria-label="tăng 12,4% so với kỳ trước"><i data-lucide="trending-up"></i>+12,4%</span> · kỳ trước 148</div>
-    <svg class="pl-spark rising-bad" viewBox="0 0 120 38" preserveAspectRatio="none" role="img" aria-label="Tồn đọng chờ duyệt tăng liên tục 12 tháng, từ 92 lên 166 bản ghi">
-      <path class="spark-area" d="M0 30 L11 28 L22 25 L33 24 L44 21 L55 19 L65 16 L76 14 L87 12 L98 10 L109 10 L120 4 L120 38 L0 38 Z"/>
-      <path d="M0 30 L11 28 L22 25 L33 24 L44 21 L55 19 L65 16 L76 14 L87 12 L98 10 L109 10 L120 4"/>
+    <div class="pl-metric-head"><span>Câu hỏi pháp luật</span><i data-lucide="message-circle-question"></i></div>
+    <div class="pl-value">2.460</div>
+    <div class="pl-meta"><span class="pl-trend good" title="So với kỳ trước" aria-label="tăng 11,2% so với kỳ trước"><i data-lucide="trending-up"></i>+11,2%</span> · kỳ trước 2.212</div>
+    <svg class="pl-kpi-line" viewBox="0 0 320 56" role="img" aria-label="Số câu hỏi pháp luật tăng đều 12 tháng, từ 1.620 lên 2.460">
+      <line class="line-base" x1="6" y1="38" x2="314" y2="38"/>
+      <path d="M6 30 L34 26 L62 24 L90 21 L118 18 L146 15 L174 13 L202 11 L230 9 L258 7 L286 5 L314 4"/>
+      <circle class="line-dot" cx="314" cy="4" r="3"/>
+      <text x="6" y="52">T9/2025</text>
+      <text class="axis-end" x="314" y="52">T8/2026</text>
+    </svg>
+  </button>
+  <button class="pl-metric" type="button">
+    <div class="pl-metric-head"><span>Dự thảo đang mở</span><i data-lucide="file-signature"></i></div>
+    <div class="pl-value">396</div>
+    <div class="pl-meta"><span class="pl-trend good" title="So với kỳ trước" aria-label="tăng 12,5% so với kỳ trước"><i data-lucide="trending-up"></i>+12,5%</span> · kỳ trước 352</div>
+    <svg class="pl-kpi-line" viewBox="0 0 320 56" role="img" aria-label="Số dự thảo tăng dần 12 tháng, từ 210 lên 396, có tháng giảm nhẹ">
+      <line class="line-base" x1="6" y1="38" x2="314" y2="38"/>
+      <path d="M6 30 L34 28 L62 26 L90 23 L118 25 L146 20 L174 18 L202 15 L230 12 L258 14 L286 8 L314 4"/>
+      <circle class="line-dot" cx="314" cy="4" r="3"/>
+      <text x="6" y="52">T9/2025</text>
+      <text class="axis-end" x="314" y="52">T8/2026</text>
     </svg>
   </button>
 </section>
 
-<div class="pl-chart-pair">
-  <!-- Văn bản theo loại -->
-  <section class="pl-panel pl-content-type">
-    <h4>Văn bản theo loại</h4>
-    <div class="pl-sub">Văn bản pháp luật · cộng đủ 76.587</div>
-    <div class="pl-donut-wrap">
-      <svg class="pl-donut" viewBox="0 0 160 160" role="img" aria-label="Cơ cấu 76.587 văn bản: thông tư 26.430 tương đương 34,5%, quyết định 21.552 tương đương 28,1%, nghị định 18.760 tương đương 24,5%, luật và pháp lệnh 9.845 tương đương 12,9%">
-        <g transform="rotate(-90 80 80)">
-          <circle class="donut-track" cx="80" cy="80" r="60"/>
-          <circle cx="80" cy="80" r="60" pathLength="100" stroke="#3769d6" stroke-dasharray="34.5 65.5" stroke-dashoffset="0"/>
-          <circle cx="80" cy="80" r="60" pathLength="100" stroke="#e59500" stroke-dasharray="28.1 71.9" stroke-dashoffset="-34.5"/>
-          <circle cx="80" cy="80" r="60" pathLength="100" stroke="#15936c" stroke-dasharray="24.5 75.5" stroke-dashoffset="-62.6"/>
-          <circle cx="80" cy="80" r="60" pathLength="100" stroke="#7d8da8" stroke-dasharray="12.9 87.1" stroke-dashoffset="-87.1"/>
-        </g>
-        <text class="donut-total" x="80" y="80">76.587</text>
-        <text class="donut-caption" x="80" y="97">văn bản</text>
-      </svg>
-      <div class="pl-donut-legend">
-        <div class="pl-donut-item"><i style="background:#3769d6"></i><span>Thông tư</span><strong>26.430</strong><em>34,5%</em></div>
-        <div class="pl-donut-item"><i style="background:#e59500"></i><span>Quyết định</span><strong>21.552</strong><em>28,1%</em></div>
-        <div class="pl-donut-item"><i style="background:#15936c"></i><span>Nghị định</span><strong>18.760</strong><em>24,5%</em></div>
-        <div class="pl-donut-item"><i style="background:#7d8da8"></i><span>Luật / Pháp lệnh</span><strong>9.845</strong><em>12,9%</em></div>
-      </div>
+<div class="pl-chart-pair pl-news-row">
+<!-- Lượt xem và bình luận dùng chung một biểu đồ, đổi bằng nút chuyển chỉ số -->
+<section class="pl-panel pl-content-type pl-news-trend">
+  <div class="pl-panel-head">
+    <div>
+      <h4 id="pl-news-title">Xu hướng tin tức theo lĩnh vực · 30 ngày</h4>
+      <div class="pl-sub" id="pl-news-sub">Top 5 lĩnh vực phổ biến nhất · lượt xem theo tuần</div>
     </div>
-    <div class="pl-chart-recommendation"><strong>Cách đọc:</strong> thông tư và quyết định chiếm 62,6% kho văn bản, nên phần tra cứu và cảnh báo hiệu lực cần ưu tiên hai loại này.</div>
-  </section>
+    <div class="pl-toggle" id="pl-news-toggle" role="group" aria-label="Chỉ số tin tức">
+      <button type="button" data-metric="views" aria-pressed="true">Lượt xem</button>
+      <button type="button" data-metric="comments" aria-pressed="false">Bình luận</button>
+    </div>
+  </div>
+  <svg class="pl-line-chart" id="pl-news-chart" viewBox="0 0 1200 300" data-x0="72" data-x1="1176" data-top="34" data-base="238" role="img" aria-label="Biểu đồ đường lượt xem tin tức của năm lĩnh vực pháp luật">
+    <line class="chart-grid" x1="72" y1="34" x2="1176" y2="34"/>
+    <line class="chart-grid" x1="72" y1="136" x2="1176" y2="136"/>
+    <line class="chart-grid" x1="72" y1="238" x2="1176" y2="238"/>
+    <text class="axis-y" x="64" y="38">14 nghìn</text>
+    <text class="axis-y" x="64" y="140">7</text>
+    <text class="axis-y" x="64" y="242">0</text>
+    <path class="chart-line"/>
+    <path class="chart-line-2"/>
+    <path class="chart-line-3"/>
+    <path class="chart-line-4"/>
+    <path class="chart-line-5"/>
+    <circle class="chart-dot" cx="1176" cy="60" r="5"/>
+  </svg>
+  <div class="pl-chart-legend">
+    <span class="pl-chart-key"><i style="background:#3769d6"></i>Đất đai &amp; nhà ở</span>
+    <span class="pl-chart-key"><i style="background:#e59500"></i>Hôn nhân &amp; gia đình</span>
+    <span class="pl-chart-key"><i style="background:#15936c"></i>Lao động &amp; việc làm</span>
+    <span class="pl-chart-key"><i style="background:#9966cc"></i>Giao thông</span>
+    <span class="pl-chart-key"><i style="background:#7d8da8"></i>BHXH &amp; bảo hiểm</span>
+  </div>
+  <div class="pl-chart-recommendation" id="pl-news-note"><strong>Cách đọc:</strong> đất đai dẫn đầu lượt xem; tab Bình luận cho thấy lao động vượt hôn nhân.</div>
+</section>
 
-  <!-- Văn bản theo trạng thái hiệu lực -->
-  <section class="pl-panel pl-content-type">
-    <h4>Trạng thái hiệu lực</h4>
-    <div class="pl-sub">Văn bản pháp luật · cộng đủ 76.587</div>
-    <div class="pl-donut-wrap">
-      <svg class="pl-donut" viewBox="0 0 160 160" role="img" aria-label="Trên 76.587 văn bản: còn hiệu lực 57.136 tương đương 74,6%, sắp hết hiệu lực 1.284 tương đương 1,7%, hết hiệu lực 18.167 tương đương 23,7%">
-        <g transform="rotate(-90 80 80)">
-          <circle class="donut-track" cx="80" cy="80" r="60"/>
-          <circle cx="80" cy="80" r="60" pathLength="100" stroke="#15936c" stroke-dasharray="74.6 25.4" stroke-dashoffset="0"/>
-          <circle cx="80" cy="80" r="60" pathLength="100" stroke="#e59500" stroke-dasharray="1.7 98.3" stroke-dashoffset="-74.6"/>
-          <circle cx="80" cy="80" r="60" pathLength="100" stroke="#7d8da8" stroke-dasharray="23.7 76.3" stroke-dashoffset="-76.3"/>
-        </g>
-        <text class="donut-total" x="80" y="80">58.420</text>
-        <text class="donut-caption" x="80" y="97">còn hiệu lực</text>
-      </svg>
-      <div class="pl-donut-legend">
-        <div class="pl-donut-item"><i style="background:#15936c"></i><span>Còn hiệu lực</span><strong>57.136</strong><em>74,6%</em></div>
-        <div class="pl-donut-item"><i style="background:#e59500"></i><span>Sắp hết hiệu lực</span><strong>1.284</strong><em>1,7%</em></div>
-        <div class="pl-donut-item"><i style="background:#7d8da8"></i><span>Hết hiệu lực</span><strong>18.167</strong><em>23,7%</em></div>
-      </div>
+  <!-- Hàng chờ xử lý -->
+  <section class="pl-panel pl-queue">
+    <h4>Danh mục chờ duyệt</h4>
+    <div class="pl-sub">Chỉ gồm bản ghi đang tồn đọng hoặc quá hạn, không phải tổng số</div>
+    <div class="pl-list">
+      <button class="pl-row" type="button"><span class="pl-row-icon"><i data-lucide="file-clock"></i></span><span class="pl-row-label">Tin bài đang chờ duyệt<small>content_articles</small></span><span class="pl-row-number warn">157</span></button>
+      <button class="pl-row" type="button"><span class="pl-row-icon"><i data-lucide="message-circle-warning"></i></span><span class="pl-row-label">Chủ đề diễn đàn chờ duyệt<small>forum_topics</small></span><span class="pl-row-number warn">9</span></button>
+      <button class="pl-row" type="button"><span class="pl-row-icon"><i data-lucide="file-pen-line"></i></span><span class="pl-row-label">Nội dung bị từ chối cần sửa<small>content_articles</small></span><span class="pl-row-number">18</span></button>
+      <button class="pl-row" type="button"><span class="pl-row-icon"><i data-lucide="inbox"></i></span><span class="pl-row-label">Kiến nghị mới chưa phân loại<small>recommendation · trong tổng 452</small></span><span class="pl-row-number">74</span></button>
+      <button class="pl-row" type="button"><span class="pl-row-icon"><i data-lucide="alarm-clock-off"></i></span><span class="pl-row-label">Kiến nghị quá hạn phản hồi<small>recommendation</small></span><span class="pl-row-number warn">32</span></button>
+      <button class="pl-row" type="button"><span class="pl-row-icon"><i data-lucide="circle-help"></i></span><span class="pl-row-label">Câu hỏi chưa trả lời<small>law_qa_answer</small></span><span class="pl-row-number warn">335</span></button>
     </div>
-    <div class="pl-chart-recommendation"><strong>Cách đọc:</strong> 58.420 văn bản còn hiệu lực gồm cả 1.284 văn bản sắp hết hiệu lực cần rà soát trước khi hết hạn.</div>
   </section>
 </div>
 
 <div class="pl-chart-pair">
+  <!-- Câu hỏi tiếp nhận so với đã trả lời -->
+  <section class="pl-panel pl-content-type">
+    <h4>Câu hỏi tiếp nhận và đã trả lời · 12 tháng</h4>
+    <div class="pl-sub">Hỏi đáp pháp luật · tỷ lệ trả lời kỳ này 86,4% (2.125 / 2.460) · kỳ trước 84,3%</div>
+    <svg class="pl-kpi-bars" viewBox="0 0 356 64" role="img" aria-label="Cột kép 12 tháng: mỗi tháng cột xanh là số câu hỏi tiếp nhận, cột xanh lá là số câu đã trả lời. Tháng 8 có 2.460 câu hỏi và 2.125 câu đã trả lời.">
+      <line class="bar-base" x1="4" y1="44" x2="352" y2="44"/>
+      <rect class="bar-recv" x="8" y="19" width="11" height="25"/><rect class="bar-done" x="21" y="24" width="11" height="20"/>
+      <rect class="bar-recv" x="37" y="18" width="11" height="26"/><rect class="bar-done" x="50" y="23" width="11" height="21"/>
+      <rect class="bar-recv" x="66" y="17" width="11" height="27"/><rect class="bar-done" x="79" y="21" width="11" height="23"/>
+      <rect class="bar-recv" x="95" y="15" width="11" height="29"/><rect class="bar-done" x="108" y="21" width="11" height="23"/>
+      <rect class="bar-recv" x="124" y="14" width="11" height="30"/><rect class="bar-done" x="137" y="19" width="11" height="25"/>
+      <rect class="bar-recv" x="153" y="13" width="11" height="31"/><rect class="bar-done" x="166" y="18" width="11" height="26"/>
+      <rect class="bar-recv" x="182" y="12" width="11" height="32"/><rect class="bar-done" x="195" y="17" width="11" height="27"/>
+      <rect class="bar-recv" x="211" y="10" width="11" height="34"/><rect class="bar-done" x="224" y="15" width="11" height="29"/>
+      <rect class="bar-recv" x="240" y="9" width="11" height="35"/><rect class="bar-done" x="253" y="14" width="11" height="30"/>
+      <rect class="bar-recv" x="269" y="8" width="11" height="36"/><rect class="bar-done" x="282" y="14" width="11" height="30"/>
+      <rect class="bar-recv" x="298" y="7" width="11" height="37"/><rect class="bar-done" x="311" y="12" width="11" height="32"/>
+      <rect class="bar-recv" x="327" y="6" width="11" height="38"/><rect class="bar-done" x="340" y="11" width="11" height="33"/>
+      <text x="20" y="58">T9</text>
+      <text x="49" y="58">T10</text>
+      <text x="78" y="58">T11</text>
+      <text x="107" y="58">T12</text>
+      <text x="136" y="58">T1</text>
+      <text x="165" y="58">T2</text>
+      <text x="194" y="58">T3</text>
+      <text x="223" y="58">T4</text>
+      <text x="252" y="58">T5</text>
+      <text x="281" y="58">T6</text>
+      <text x="310" y="58">T7</text>
+      <text x="346" y="58">T8</text>
+    </svg>
+    <div class="pl-chart-legend">
+      <span class="pl-chart-key"><i style="background:#3769d6;height:8px;border-radius:2px"></i>Câu hỏi tiếp nhận</span>
+      <span class="pl-chart-key"><i style="background:#15936c;height:8px;border-radius:2px"></i>Đã trả lời</span>
+    </div>
+    <div class="pl-chart-recommendation"><strong>Cách đọc:</strong> khoảng cách giữa hai cột mỗi tháng là số câu chưa trả lời; kỳ này còn 335 câu.</div>
+  </section>
+
   <!-- Lĩnh vực được hỏi nhiều nhất -->
   <section class="pl-panel pl-content-type">
     <h4>Lĩnh vực được hỏi nhiều nhất</h4>
-    <div class="pl-sub">Hỏi đáp pháp luật · Top 4 trong 2.460 câu</div>
+    <div class="pl-sub">Hỏi đáp pháp luật · Top 5 trong 2.460 câu · % so với cùng kỳ</div>
     <div class="pl-mini-bars">
-      <div class="pl-mini-bar"><span>Đất đai &amp; nhà ở</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:100%"></div></div><strong>592</strong></div>
-      <div class="pl-mini-bar"><span>Hôn nhân &amp; gia đình</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:70.6%"></div></div><strong>418</strong></div>
-      <div class="pl-mini-bar"><span>Lao động &amp; việc làm</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:60.1%"></div></div><strong>356</strong></div>
-      <div class="pl-mini-bar"><span>BHXH &amp; bảo hiểm</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:48.5%"></div></div><strong>287</strong></div>
+      <div class="pl-mini-bar"><span>Đất đai &amp; nhà ở</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:100%"></div></div><strong>592</strong><em class="good" title="So với cùng kỳ">+24,1%</em></div>
+      <div class="pl-mini-bar"><span>Hôn nhân &amp; gia đình</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:70.6%"></div></div><strong>418</strong><em class="good" title="So với cùng kỳ">+17,0%</em></div>
+      <div class="pl-mini-bar"><span>Lao động &amp; việc làm</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:60.1%"></div></div><strong>356</strong><em class="good" title="So với cùng kỳ">+14,5%</em></div>
+      <div class="pl-mini-bar"><span>BHXH &amp; bảo hiểm</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:48.5%"></div></div><strong>287</strong><em class="down" title="So với cùng kỳ">-11,7%</em></div>
+      <div class="pl-mini-bar"><span>Giao thông</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:36.1%"></div></div><strong>214</strong><em class="good" title="So với cùng kỳ">+9,3%</em></div>
     </div>
-    <div class="pl-chart-recommendation"><strong>Cách đọc:</strong> bốn lĩnh vực này chiếm 67,6% câu hỏi trong kỳ, nên bố trí chuyên viên trả lời theo đúng thứ tự này.</div>
-  </section>
-
-  <!-- Chủ đề PBGDPL được quan tâm -->
-  <section class="pl-panel pl-content-type">
-    <h4>Chủ đề được quan tâm</h4>
-    <div class="pl-sub">Phổ biến, giáo dục pháp luật · lượt xem và tải</div>
-    <div class="pl-mini-bars">
-      <div class="pl-mini-bar"><span>Đất đai &amp; nhà ở</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:100%"></div></div><strong>9.420</strong></div>
-      <div class="pl-mini-bar"><span>Hôn nhân &amp; gia đình</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:73%"></div></div><strong>6.880</strong></div>
-      <div class="pl-mini-bar"><span>Lao động &amp; việc làm</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:55.8%"></div></div><strong>5.260</strong></div>
-      <div class="pl-mini-bar"><span>Giao thông</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:35%"></div></div><strong>3.300</strong></div>
-    </div>
-    <div class="pl-chart-recommendation"><strong>Cách đọc:</strong> thứ tự chủ đề được xem, tải trùng với thứ tự lĩnh vực được hỏi — nhu cầu tra cứu và nhu cầu hỏi đang cùng tập trung vào đất đai, nhà ở.</div>
+    <div class="pl-chart-recommendation"><strong>Cách đọc:</strong> cột phải là tăng/giảm so với cùng kỳ năm trước, không phải tỷ trọng trong 2.460 câu. BHXH đang giảm 11,7% dù vẫn nằm trong top 5.</div>
   </section>
 </div>
 
-<!-- Hàng chờ xử lý -->
-<section class="pl-panel pl-queue">
-  <h4>Việc cần xử lý ngay</h4>
-  <div class="pl-sub">Chỉ gồm bản ghi đang tồn đọng hoặc quá hạn, không phải tổng số</div>
-  <div class="pl-list">
-    <button class="pl-row" type="button"><span class="pl-row-icon"><i data-lucide="file-clock"></i></span><span class="pl-row-label">Tin bài đang chờ duyệt<small>content_articles</small></span><span class="pl-row-number warn">157</span></button>
-    <button class="pl-row" type="button"><span class="pl-row-icon"><i data-lucide="message-circle-warning"></i></span><span class="pl-row-label">Chủ đề diễn đàn chờ duyệt<small>forum_topics</small></span><span class="pl-row-number warn">9</span></button>
-    <button class="pl-row" type="button"><span class="pl-row-icon"><i data-lucide="file-pen-line"></i></span><span class="pl-row-label">Nội dung bị từ chối cần sửa<small>content_articles</small></span><span class="pl-row-number">18</span></button>
-    <button class="pl-row" type="button"><span class="pl-row-icon"><i data-lucide="inbox"></i></span><span class="pl-row-label">Kiến nghị mới chưa phân loại<small>recommendation · trong tổng 452</small></span><span class="pl-row-number">74</span></button>
-    <button class="pl-row" type="button"><span class="pl-row-icon"><i data-lucide="alarm-clock-off"></i></span><span class="pl-row-label">Kiến nghị quá hạn phản hồi<small>recommendation</small></span><span class="pl-row-number warn">32</span></button>
-    <button class="pl-row" type="button"><span class="pl-row-icon"><i data-lucide="circle-help"></i></span><span class="pl-row-label">Câu hỏi chưa trả lời<small>law_qa_answer</small></span><span class="pl-row-number warn">335</span></button>
-  </div>
-</section>
+<div class="pl-chart-triple">
+  <!-- Top diễn đàn theo thành viên -->
+  <section class="pl-panel pl-content-type">
+    <h4>Top 5 diễn đàn nhiều thành viên nhất</h4>
+    <div class="pl-sub">Diễn đàn · số thành viên đang tham gia từng chuyên mục · % so với cùng kỳ</div>
+    <div class="pl-mini-bars">
+      <div class="pl-mini-bar"><span>Đất đai &amp; nhà ở</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:100%"></div></div><strong>9</strong><em class="good" title="So với cùng kỳ">+28,6%</em></div>
+      <div class="pl-mini-bar"><span>Hôn nhân &amp; gia đình</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:77.8%"></div></div><strong>7</strong><em class="good" title="So với cùng kỳ">+16,7%</em></div>
+      <div class="pl-mini-bar"><span>Lao động &amp; việc làm</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:66.7%"></div></div><strong>6</strong><em class="good" title="So với cùng kỳ">+20,0%</em></div>
+      <div class="pl-mini-bar"><span>Doanh nghiệp &amp; đầu tư</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:44.4%"></div></div><strong>4</strong><em class="good" title="So với cùng kỳ">+33,3%</em></div>
+      <div class="pl-mini-bar"><span>Giao thông</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:33.3%"></div></div><strong>3</strong><em class="down" title="So với cùng kỳ">-25,0%</em></div>
+    </div>
+    <div class="pl-chart-recommendation"><strong>Cách đọc:</strong> cột phải là tăng/giảm thành viên so với cùng kỳ; giao thông là chuyên mục duy nhất mất thành viên (-25%).</div>
+  </section>
+
+  <!-- Top dự thảo theo góp ý -->
+  <section class="pl-panel pl-content-type">
+    <h4>Top 5 dự thảo có nhiều góp ý nhất</h4>
+    <div class="pl-sub">Dự thảo đang mở · số góp ý / kiến nghị · % so với cùng kỳ</div>
+    <div class="pl-mini-bars">
+      <div class="pl-mini-bar"><span>Luật Đất đai (sửa đổi)</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:100%"></div></div><strong>86</strong><em class="good" title="So với cùng kỳ">+18,2%</em></div>
+      <div class="pl-mini-bar"><span>NĐ hướng dẫn BHXH</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:74.4%"></div></div><strong>64</strong><em class="good" title="So với cùng kỳ">+12,3%</em></div>
+      <div class="pl-mini-bar"><span>Luật Nhà ở</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:60.5%"></div></div><strong>52</strong><em class="down" title="So với cùng kỳ">-6,4%</em></div>
+      <div class="pl-mini-bar"><span>TT giao thông đường bộ</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:47.7%"></div></div><strong>41</strong><em class="good" title="So với cùng kỳ">+24,2%</em></div>
+      <div class="pl-mini-bar"><span>Luật Doanh nghiệp (sửa đổi)</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:32.6%"></div></div><strong>28</strong><em class="good" title="So với cùng kỳ">+7,7%</em></div>
+    </div>
+    <div class="pl-chart-recommendation"><strong>Cách đọc:</strong> Luật Đất đai đang nhận nhiều góp ý nhất (86); Luật Nhà ở vẫn top 3 nhưng góp ý giảm 6,4% so với cùng kỳ.</div>
+  </section>
+
+  <!-- Top lĩnh vực theo hiến kế -->
+  <section class="pl-panel pl-content-type">
+    <h4>Top 5 lĩnh vực có nhiều hiến kế nhất</h4>
+    <div class="pl-sub">Dự thảo &amp; kiến nghị · 384 / 452 hiến kế · % so với cùng kỳ</div>
+    <div class="pl-mini-bars">
+      <div class="pl-mini-bar"><span>Đất đai &amp; nhà ở</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:100%"></div></div><strong>128</strong><em class="good" title="So với cùng kỳ">+21,4%</em></div>
+      <div class="pl-mini-bar"><span>Lao động &amp; việc làm</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:73.4%"></div></div><strong>94</strong><em class="good" title="So với cùng kỳ">+8,0%</em></div>
+      <div class="pl-mini-bar"><span>Doanh nghiệp &amp; đầu tư</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:55.5%"></div></div><strong>71</strong><em class="good" title="So với cùng kỳ">+15,6%</em></div>
+      <div class="pl-mini-bar"><span>BHXH &amp; bảo hiểm</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:40.6%"></div></div><strong>52</strong><em class="down" title="So với cùng kỳ">-9,2%</em></div>
+      <div class="pl-mini-bar"><span>Giao thông</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:30.5%"></div></div><strong>39</strong><em class="good" title="So với cùng kỳ">+11,1%</em></div>
+    </div>
+    <div class="pl-chart-recommendation"><strong>Cách đọc:</strong> đất đai vừa bị hỏi nhiều nhất vừa nhận nhiều hiến kế nhất (128). BHXH giảm 9,2% so với cùng kỳ dù vẫn nằm trong top 5.</div>
+  </section>
+</div>
 
 </div>
 
@@ -631,12 +760,13 @@
   <!-- Lĩnh vực được hỏi nhiều nhất -->
   <section class="pl-panel pl-content-type pl-chart-half" data-module="qa">
     <h4>Lĩnh vực được hỏi nhiều nhất</h4>
-    <div class="pl-sub">Hỏi đáp pháp luật · Top 4 trong 2.460 câu</div>
+    <div class="pl-sub">Hỏi đáp pháp luật · Top 5 trong 2.460 câu · % so với cùng kỳ</div>
     <div class="pl-mini-bars">
-      <div class="pl-mini-bar"><span>Đất đai &amp; nhà ở</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:100%"></div></div><strong>592</strong></div>
-      <div class="pl-mini-bar"><span>Hôn nhân &amp; gia đình</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:70.6%"></div></div><strong>418</strong></div>
-      <div class="pl-mini-bar"><span>Lao động &amp; việc làm</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:60.1%"></div></div><strong>356</strong></div>
-      <div class="pl-mini-bar"><span>BHXH &amp; bảo hiểm</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:48.5%"></div></div><strong>287</strong></div>
+      <div class="pl-mini-bar"><span>Đất đai &amp; nhà ở</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:100%"></div></div><strong>592</strong><em class="good" title="So với cùng kỳ">+24,1%</em></div>
+      <div class="pl-mini-bar"><span>Hôn nhân &amp; gia đình</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:70.6%"></div></div><strong>418</strong><em class="good" title="So với cùng kỳ">+17,0%</em></div>
+      <div class="pl-mini-bar"><span>Lao động &amp; việc làm</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:60.1%"></div></div><strong>356</strong><em class="good" title="So với cùng kỳ">+14,5%</em></div>
+      <div class="pl-mini-bar"><span>BHXH &amp; bảo hiểm</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:48.5%"></div></div><strong>287</strong><em class="down" title="So với cùng kỳ">-11,7%</em></div>
+      <div class="pl-mini-bar"><span>Giao thông</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:36.1%"></div></div><strong>214</strong><em class="good" title="So với cùng kỳ">+9,3%</em></div>
     </div>
     <div class="pl-chart-recommendation"><strong>Nên dùng:</strong> cột ngang Top lĩnh vực và đường hai chuỗi “Tiếp nhận / Đã trả lời” theo tháng.</div>
   </section>
@@ -805,10 +935,240 @@
 
   const rangeLabel = document.getElementById('pl-range-label');
   const periodButtons = root.querySelectorAll('.pl-period button');
+  const overviewPanel = document.getElementById('pl-panel-overview');
+  const periodKey = { 'Hôm nay': 'today', '7 ngày': 'week', '30 ngày': 'month', '12 tháng': 'year' };
+  const periodData = {
+    today: {
+      label: 'Hôm nay',
+      compare: 'hôm qua',
+      grain: 'hôm nay so với hôm qua',
+      edge: ['Hôm qua', 'Hôm nay'],
+      axis: ['Hôm qua', 'Hôm nay'],
+      metrics: [
+        ['128.450','+0,2%','128.193','up'], ['86','+4,9%','82','up'],
+        ['2','-33,3%','3','down'], ['297','+1,7%','292','up'],
+        ['82','+7,9%','76','up'], ['396','+0,8%','393','up']
+      ],
+      qa: ['82','70','85,4%','84,2%'],
+      line: [22, 8],
+      recv: [28, 33],
+      done: [22, 27],
+      chartScale: ['950','475'],
+      commentScale: ['32','16'],
+      barScale: .035
+    },
+    week: {
+      label: '7 ngày',
+      compare: '7 ngày trước',
+      grain: 'theo ngày',
+      edge: ['14/08', '20/08'],
+      axis: ['14/8','15/8','16/8','17/8','18/8','19/8','20/8'],
+      metrics: [
+        ['128.450','+0,8%','127.430','up'], ['612','+8,1%','566','up'],
+        ['8','+14,3%','7','up'], ['2.081','-1,1%','2.104','down'],
+        ['574','+9,8%','523','up'], ['396','+3,4%','383','up']
+      ],
+      qa: ['574','491','85,5%','83,9%'],
+      line: [28, 22, 25, 16, 20, 10, 6],
+      recv: [22, 24, 21, 27, 25, 29, 32],
+      done: [18, 20, 17, 23, 21, 24, 27],
+      chartScale: ['5,4 nghìn','2,7'],
+      commentScale: ['140','70'],
+      barScale: .24
+    },
+    month: {
+      label: '30 ngày',
+      compare: '30 ngày trước',
+      grain: 'theo tuần',
+      edge: ['20/7', '20/8'],
+      axis: ['Tuần 1','Tuần 2','Tuần 3','Tuần 4'],
+      metrics: [
+        ['128.450','+3,5%','124.100','up'], ['2.565','+6,4%','2.410','up'],
+        ['29','+16,0%','25','up'], ['8.919','-2,3%','9.129','down'],
+        ['2.460','+11,2%','2.212','up'], ['396','+12,5%','352','up']
+      ],
+      qa: ['2.460','2.125','86,4%','84,3%'],
+      line: [26, 18, 12, 6],
+      recv: [24, 28, 31, 36],
+      done: [19, 23, 26, 31],
+      chartScale: ['14 nghìn','7'],
+      commentScale: ['320','160'],
+      barScale: 1
+    },
+    year: {
+      label: '12 tháng',
+      compare: 'cùng kỳ năm trước',
+      grain: 'theo tháng',
+      edge: ['T9/2025', 'T8/2026'],
+      axis: ['T9','T10','T11','T12','T1','T2','T3','T4','T5','T6','T7','T8'],
+      metrics: [
+        ['128.450','+20,4%','106.686','up'], ['24.320','+18,7%','20.489','up'],
+        ['214','+23,7%','173','up'], ['96.540','+4,8%','92.118','up'],
+        ['27.380','+15,4%','23.726','up'], ['396','+38,0%','287','up']
+      ],
+      qa: ['27.380','23.902','87,3%','82,6%'],
+      line: [32,28,24,26,18,16,12,14,9,6,8,3],
+      recv: [25,26,27,29,30,31,32,34,35,36,37,38],
+      done: [20,21,23,23,25,26,27,29,30,30,32,33],
+      chartScale: ['138 nghìn','69'],
+      commentScale: ['4,1 nghìn','2,05'],
+      barScale: 10.8
+    }
+  };
+
+  const metricCards = [...root.querySelectorAll('.pl-metric')];
+  const overviewBars = [...overviewPanel.querySelectorAll('.pl-mini-bar')];
+  overviewBars.forEach(row => {
+    row.dataset.baseValue = row.querySelector('strong')?.textContent.replace(/\./g, '') || '0';
+  });
+
+  const syncKpiArea = svg => {
+    const line = svg.querySelector('path:not(.line-area)');
+    const base = svg.querySelector('.line-base');
+    if (!line || !base) return;
+    svg.querySelector('.line-area')?.remove();
+    const points = line.getAttribute('d').match(/-?\d+(?:\.\d+)?/g);
+    if (!points) return;
+    const y = base.getAttribute('y1');
+    const area = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    area.setAttribute('class', 'line-area');
+    area.setAttribute('d', `${line.getAttribute('d')} L${points[points.length - 2]} ${y} L${points[0]} ${y} Z`);
+    line.before(area);
+  };
+
+  const spread = (count, x0, x1) => count < 2
+    ? [(x0 + x1) / 2]
+    : Array.from({ length: count }, (_, i) => x0 + i * (x1 - x0) / (count - 1));
+
+  const ns = (name, attrs = {}, text) => {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', name);
+    Object.entries(attrs).forEach(([key, value]) => el.setAttribute(key, value));
+    if (text != null) el.textContent = text;
+    return el;
+  };
+
+  // Lượt xem và bình luận dùng cùng một biểu đồ; mỗi chỉ số chỉ khác thứ tự
+  // giãn của năm lĩnh vực, nên chỉ cần vẽ lại thay vì dựng hai biểu đồ.
+  const newsChart = document.getElementById('pl-news-chart');
+  const newsToggle = document.getElementById('pl-news-toggle');
+  const newsMetrics = {
+    views: { name: 'Lượt xem', unit: 'lượt xem', lifts: [0, 1, 2, 3, 4], scale: 'chartScale' },
+    comments: { name: 'Bình luận', unit: 'số bình luận', lifts: [0, 2, 1, 4, 3], scale: 'commentScale' }
+  };
+  let newsMetric = 'views';
+
+  const drawNewsChart = data => {
+    const metric = newsMetrics[newsMetric];
+    const n = data.axis.length;
+    const x0 = Number(newsChart.dataset.x0);
+    const x1 = Number(newsChart.dataset.x1);
+    const top = Number(newsChart.dataset.top);
+    const base = Number(newsChart.dataset.base);
+    const xs = spread(n, x0, x1);
+    const lines = newsChart.querySelectorAll('path');
+
+    lines.forEach((line, lineIndex) => {
+      const lift = metric.lifts[lineIndex];
+      const ys = data.line.map((value, point) => {
+        const height = (36 - value) / 36 * (1 - lift * .15) + ((point + lift) % 3) * .012;
+        return base - Math.max(.04, Math.min(1, height)) * (base - top);
+      });
+      line.setAttribute('d', ys.map((y, point) => `${point ? 'L' : 'M'}${xs[point]} ${y.toFixed(1)}`).join(' '));
+    });
+
+    newsChart.querySelectorAll('.axis-x').forEach(label => label.remove());
+    data.axis.forEach((tick, i) => newsChart.appendChild(ns('text', { class: 'axis-x', x: xs[i], y: base + 30 }, tick)));
+
+    const scale = data[metric.scale];
+    const yLabels = newsChart.querySelectorAll('.axis-y');
+    yLabels[0].textContent = scale[0];
+    yLabels[1].textContent = scale[1];
+
+    const dot = newsChart.querySelector('.chart-dot');
+    const last = lines[0].getAttribute('d').match(/[\d.]+$/);
+    dot.setAttribute('cx', xs[n - 1]);
+    if (last) dot.setAttribute('cy', last[0]);
+
+    newsChart.setAttribute('aria-label', `Biểu đồ đường ${metric.unit} tin tức của năm lĩnh vực pháp luật, ${data.grain}, kỳ ${data.label}`);
+    document.getElementById('pl-news-title').textContent = `Xu hướng tin tức theo lĩnh vực · ${data.label}`;
+    document.getElementById('pl-news-sub').textContent = `Top 5 lĩnh vực phổ biến nhất · ${metric.unit} ${data.grain}`;
+  };
+
+  const updatePeriod = key => {
+    const data = periodData[key];
+    const n = data.axis.length;
+    const compareTitle = `So với ${data.compare}`;
+
+    metricCards.forEach((card, index) => {
+      const [value, trendValue, previous, direction] = data.metrics[index];
+      card.querySelector('.pl-value').textContent = value;
+      const trend = card.querySelector('.pl-trend');
+      trend.className = `pl-trend ${direction === 'down' ? 'warn' : 'good'}`;
+      trend.innerHTML = `<i data-lucide="trending-${direction}"></i>${trendValue}`;
+      trend.setAttribute('aria-label', `${direction === 'down' ? 'giảm' : 'tăng'} ${trendValue.replace(/^[+-]/, '')} ${compareTitle.toLowerCase()}`);
+      trend.setAttribute('title', compareTitle);
+      const suffix = index === 2 && key === 'month' ? ' · 125 bình luận' : '';
+      card.querySelector('.pl-meta').lastChild.textContent = ` · ${data.compare} ${previous}${suffix}`;
+
+      const svg = card.querySelector('.pl-kpi-line');
+      const xs = spread(n, 6, 314);
+      const ys = data.line.map((y, point) => Math.max(3, Math.min(35, y + ((index * 3 + point) % 5) - 2)));
+      const path = ys.map((y, point) => `${point ? 'L' : 'M'}${xs[point]} ${y}`).join(' ');
+      svg.querySelector('path:not(.line-area)').setAttribute('d', path);
+      const dot = svg.querySelector('.line-dot');
+      dot.setAttribute('cx', xs[n - 1]);
+      dot.setAttribute('cy', ys[n - 1]);
+      const labels = svg.querySelectorAll('text');
+      labels[0].textContent = data.edge[0];
+      labels[1].textContent = data.edge[1];
+      syncKpiArea(svg);
+    });
+
+    drawNewsChart(data);
+
+    const barSvg = overviewPanel.querySelector('.pl-kpi-bars');
+    barSvg.querySelectorAll('rect, text').forEach(el => el.remove());
+    const slot = 348 / n;
+    const barW = n <= 2 ? 22 : n <= 4 ? 16 : n <= 7 ? 12 : 11;
+    data.recv.forEach((height, i) => {
+      const x = 8 + i * slot + (slot - barW * 2 - 2) / 2;
+      const doneH = data.done[i];
+      barSvg.appendChild(ns('rect', { class: 'bar-recv', x, y: 44 - height, width: barW, height }));
+      barSvg.appendChild(ns('rect', { class: 'bar-done', x: x + barW + 2, y: 44 - doneH, width: barW, height: doneH }));
+      barSvg.appendChild(ns('text', { x: x + barW, y: 58 }, data.axis[i]));
+    });
+    const qaPanel = barSvg.closest('section');
+    qaPanel.querySelector('h4').textContent = `Câu hỏi tiếp nhận và đã trả lời · ${data.label}`;
+    qaPanel.querySelector('.pl-sub').textContent = `Hỏi đáp pháp luật · ${data.grain} · tỷ lệ trả lời kỳ này ${data.qa[2]} (${data.qa[1]} / ${data.qa[0]}) · ${data.compare} ${data.qa[3]}`;
+    const fieldPanel = [...overviewPanel.querySelectorAll('.pl-content-type')].find(panel => panel.querySelector('h4')?.textContent === 'Lĩnh vực được hỏi nhiều nhất');
+    if (fieldPanel) fieldPanel.querySelector('.pl-sub').textContent = `Hỏi đáp pháp luật · Top 5 trong ${data.qa[0]} câu · % so với ${data.compare}`;
+
+    overviewBars.forEach(row => {
+      const value = Math.max(1, Math.round(Number(row.dataset.baseValue) * data.barScale));
+      row.querySelector('strong').textContent = value.toLocaleString('vi-VN');
+    });
+
+    overviewPanel.classList.remove('pl-data-refresh');
+    void overviewPanel.offsetWidth;
+    overviewPanel.classList.add('pl-data-refresh');
+    if (window.lucide) window.lucide.createIcons();
+  };
+
+  let currentPeriod = 'month';
   periodButtons.forEach(btn => btn.addEventListener('click', () => {
     periodButtons.forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
     rangeLabel.textContent = btn.textContent;
+    currentPeriod = periodKey[btn.textContent.trim()];
+    updatePeriod(currentPeriod);
   }));
+
+  newsToggle.querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
+    newsToggle.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+    newsMetric = btn.dataset.metric;
+    drawNewsChart(periodData[currentPeriod]);
+  }));
+
+  updatePeriod(currentPeriod);
 
   const notesToggle = document.getElementById('pl-notes');
   notesToggle.addEventListener('click', () => {
@@ -818,7 +1178,6 @@
   });
 
   const tabs = root.querySelectorAll('.pl-tabs button');
-  const overviewPanel = document.getElementById('pl-panel-overview');
   const detailPanel = document.getElementById('pl-panel-detail');
   const moduleBlocks = root.querySelectorAll('.pl-modules > [data-module]');
   const openTab = name => {
