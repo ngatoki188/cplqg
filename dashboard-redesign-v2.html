@@ -125,6 +125,20 @@
 #plqg-exec .pl-line-chart .bar-done{ fill: var(--good); }
 #plqg-exec .pl-kpi-bars .bar-base{ stroke: var(--border-soft); stroke-width: 1; }
 #plqg-exec .pl-kpi-bars text{ fill: var(--muted); font-size: 7px; text-anchor: middle; }
+/* Cột đối xứng quanh trục 0: tiếp nhận đi lên, đã trả lời đi xuống, đường nối theo dõi xu hướng tiếp nhận. */
+#plqg-exec .pl-butterfly{ display: block; width: 100%; height: auto; margin-top: 4px; overflow: visible; }
+#plqg-exec .pl-butterfly .chart-grid{ stroke: light-dark(#e2e7ee,#303846); stroke-width: 1; }
+#plqg-exec .pl-butterfly .zero{ stroke: light-dark(#94a3b8,#64748b); stroke-width: 1.5; }
+#plqg-exec .pl-butterfly .bar-now{ fill: #22c55e; }
+#plqg-exec .pl-butterfly .bar-then{ fill: #22d3ee; }
+#plqg-exec .pl-butterfly .trend{ fill: none; stroke: #1e293b; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+#plqg-exec .pl-butterfly .trend-dot{ fill: #fff; stroke: #1e293b; stroke-width: 2; }
+#plqg-exec .pl-butterfly text{ fill: var(--muted); font-size: 10px; }
+#plqg-exec .pl-butterfly .axis-x{ text-anchor: middle; }
+#plqg-exec .pl-butterfly .axis-y{ text-anchor: end; }
+#plqg-exec .pl-butterfly .axis-side{ font-size: 10px; }
+#plqg-exec .pl-butterfly .val-now{ fill: #fff; font-size: 10px; font-weight: 600; text-anchor: middle; }
+#plqg-exec .pl-butterfly .val-then{ fill: #0f172a; font-size: 10px; font-weight: 600; text-anchor: middle; }
 
 
 /* ============================================================
@@ -143,6 +157,7 @@
 /* News chart keeps the extra width; the action queue sits beside it. */
 #plqg-exec .pl-news-row{ grid-template-columns: minmax(0,1.7fr) minmax(280px,.95fr); }
 #plqg-exec .pl-news-trend{ min-width: 0; }
+#plqg-exec #pl-traffic-panel{ min-width: 0; }
 /* Two charts of the same kind sit side by side so the same five legal domains
    can be compared across metrics without scrolling. */
 #plqg-exec .pl-chart-pair{ display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; margin-bottom: 14px; }
@@ -274,6 +289,11 @@
 #plqg-exec .pl-line-chart .chart-line-4{ fill: none; stroke: #9966cc; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 #plqg-exec .pl-line-chart .chart-line-5{ fill: none; stroke: #7d8da8; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 #plqg-exec .pl-line-chart .chart-dot{ fill: var(--panel); stroke: var(--accent); stroke-width: 2; }
+#plqg-exec .pl-line-chart .chart-dot-user{ fill: var(--panel); stroke: var(--good); stroke-width: 2; }
+#plqg-exec .pl-line-chart .chart-dot-2{ fill: var(--panel); stroke: var(--warn); stroke-width: 2; }
+#plqg-exec .pl-line-chart .chart-dot-3{ fill: var(--panel); stroke: var(--good); stroke-width: 2; }
+#plqg-exec .pl-line-chart .chart-dot-4{ fill: var(--panel); stroke: #9966cc; stroke-width: 2; }
+#plqg-exec .pl-line-chart .chart-dot-5{ fill: var(--panel); stroke: #7d8da8; stroke-width: 2; }
 #plqg-exec .pl-line-chart text{ fill: var(--muted); font-size: 11px; }
 #plqg-exec .pl-line-chart .axis-x{ text-anchor: middle; }
 #plqg-exec .pl-line-chart .axis-y{ text-anchor: end; }
@@ -478,7 +498,31 @@
   </button>
 </section>
 
-<div class="pl-chart-pair pl-news-row">
+<div class="pl-chart-pair">
+<!-- Lượt truy cập và người dùng cổng: hai đường trên cùng một trục -->
+<section class="pl-panel pl-content-type" id="pl-traffic-panel">
+  <h4 id="pl-traffic-title">Biểu đồ Người dùng cổng &amp; Lượt truy cập · 30 ngày</h4>
+  <div class="pl-sub" id="pl-traffic-sub">Thống kê 2 chỉ số theo tuần · lượt / người</div>
+  <svg class="pl-line-chart" id="pl-traffic-chart" viewBox="0 0 1200 300" data-x0="96" data-x1="1176" data-top="34" data-base="238" role="img" aria-label="Lượt truy cập và số người dùng cổng theo tuần trong 30 ngày">
+    <line class="chart-grid" x1="96" y1="34" x2="1176" y2="34"/>
+    <line class="chart-grid" x1="96" y1="102" x2="1176" y2="102"/>
+    <line class="chart-grid" x1="96" y1="170" x2="1176" y2="170"/>
+    <line class="chart-grid" x1="96" y1="238" x2="1176" y2="238"/>
+    <text class="axis-y" x="88" y="38">1,0 triệu</text>
+    <text class="axis-y" x="88" y="106">660 nghìn</text>
+    <text class="axis-y" x="88" y="174">330 nghìn</text>
+    <text class="axis-y" x="88" y="242">0</text>
+    <path class="chart-line"/>
+    <path class="chart-line-3"/>
+    <g class="traffic-dots"></g>
+  </svg>
+  <div class="pl-chart-legend">
+    <span class="pl-chart-key"><i style="background:#3769d6"></i>Số lượt truy cập</span>
+    <span class="pl-chart-key"><i style="background:#15936c"></i>Số lượng người dùng cổng</span>
+  </div>
+  <div class="pl-chart-recommendation"><strong>Cách đọc:</strong> lượt truy cập cao hơn nhiều so với số người dùng vì một người vào cổng nhiều lần. Điểm “Gần nhất” là tuần chưa đủ ngày nên hai đường cùng thấp hơn tuần 4.</div>
+</section>
+
 <!-- Lượt xem và bình luận dùng chung một biểu đồ, đổi bằng nút chuyển chỉ số -->
 <section class="pl-panel pl-content-type pl-news-trend">
   <div class="pl-panel-head">
@@ -503,7 +547,7 @@
     <path class="chart-line-3"/>
     <path class="chart-line-4"/>
     <path class="chart-line-5"/>
-    <circle class="chart-dot" cx="1176" cy="60" r="5"/>
+    <g class="news-dots"></g>
   </svg>
   <div class="pl-chart-legend">
     <span class="pl-chart-key"><i style="background:#3769d6"></i>Đất đai &amp; nhà ở</span>
@@ -514,6 +558,35 @@
   </div>
   <div class="pl-chart-recommendation" id="pl-news-note"><strong>Cách đọc:</strong> đất đai dẫn đầu lượt xem; tab Bình luận cho thấy lao động vượt hôn nhân.</div>
 </section>
+</div>
+
+<div class="pl-chart-pair pl-news-row">
+  <!-- Câu hỏi tiếp nhận so với đã trả lời: cột đối xứng quanh trục 0 -->
+  <section class="pl-panel pl-content-type" id="pl-qa-panel">
+    <h4 id="pl-qa-title">Câu hỏi tiếp nhận và đã trả lời · 30 ngày</h4>
+    <div class="pl-sub" id="pl-qa-sub">Hỏi đáp pháp luật · tỷ lệ trả lời kỳ này 86,4% (2.125 / 2.460) · kỳ trước 84,3%</div>
+    <svg class="pl-butterfly" id="pl-qa-butterfly" viewBox="0 0 640 280" role="img" aria-label="Cột đối xứng: phía trên là câu hỏi tiếp nhận, phía dưới là câu đã trả lời">
+      <line class="chart-grid" x1="72" y1="36" x2="624" y2="36"/>
+      <line class="chart-grid" x1="72" y1="82" x2="624" y2="82"/>
+      <line class="zero" x1="72" y1="128" x2="624" y2="128"/>
+      <line class="chart-grid" x1="72" y1="174" x2="624" y2="174"/>
+      <line class="chart-grid" x1="72" y1="220" x2="624" y2="220"/>
+      <text class="axis-y" x="64" y="40">100</text>
+      <text class="axis-y" x="64" y="86">50</text>
+      <text class="axis-y" x="64" y="132">0</text>
+      <text class="axis-y" x="64" y="178">50</text>
+      <text class="axis-y" x="64" y="224">100</text>
+      <text class="axis-side" text-anchor="middle" transform="rotate(-90 16 82)" x="16" y="82">Tiếp nhận</text>
+      <text class="axis-side" text-anchor="middle" transform="rotate(-90 16 174)" x="16" y="174">Đã trả lời</text>
+      <g class="qa-plot"></g>
+    </svg>
+    <div class="pl-chart-legend">
+      <span class="pl-chart-key"><i style="background:#22c55e;height:8px;border-radius:2px"></i>Câu hỏi tiếp nhận</span>
+      <span class="pl-chart-key"><i style="background:#22d3ee;height:8px;border-radius:2px"></i>Đã trả lời</span>
+      <span class="pl-chart-key"><i style="background:#1e293b;height:3px;border-radius:3px"></i>Xu hướng tiếp nhận</span>
+    </div>
+    <div class="pl-chart-recommendation"><strong>Cách đọc:</strong> cột xanh lá đi lên là số câu hỏi tiếp nhận, cột xanh ngọc đi xuống là số đã trả lời. Đường đen nối đỉnh cột trên cho thấy xu hướng tiếp nhận.</div>
+  </section>
 
   <!-- Hàng chờ xử lý -->
   <section class="pl-panel pl-queue">
@@ -531,99 +604,44 @@
 </div>
 
 <div class="pl-chart-pair">
-  <!-- Câu hỏi tiếp nhận so với đã trả lời -->
-  <section class="pl-panel pl-content-type">
-    <h4>Câu hỏi tiếp nhận và đã trả lời · 12 tháng</h4>
-    <div class="pl-sub">Hỏi đáp pháp luật · tỷ lệ trả lời kỳ này 86,4% (2.125 / 2.460) · kỳ trước 84,3%</div>
-    <svg class="pl-kpi-bars" viewBox="0 0 356 64" role="img" aria-label="Cột kép 12 tháng: mỗi tháng cột xanh là số câu hỏi tiếp nhận, cột xanh lá là số câu đã trả lời. Tháng 8 có 2.460 câu hỏi và 2.125 câu đã trả lời.">
-      <line class="bar-base" x1="4" y1="44" x2="352" y2="44"/>
-      <rect class="bar-recv" x="8" y="19" width="11" height="25"/><rect class="bar-done" x="21" y="24" width="11" height="20"/>
-      <rect class="bar-recv" x="37" y="18" width="11" height="26"/><rect class="bar-done" x="50" y="23" width="11" height="21"/>
-      <rect class="bar-recv" x="66" y="17" width="11" height="27"/><rect class="bar-done" x="79" y="21" width="11" height="23"/>
-      <rect class="bar-recv" x="95" y="15" width="11" height="29"/><rect class="bar-done" x="108" y="21" width="11" height="23"/>
-      <rect class="bar-recv" x="124" y="14" width="11" height="30"/><rect class="bar-done" x="137" y="19" width="11" height="25"/>
-      <rect class="bar-recv" x="153" y="13" width="11" height="31"/><rect class="bar-done" x="166" y="18" width="11" height="26"/>
-      <rect class="bar-recv" x="182" y="12" width="11" height="32"/><rect class="bar-done" x="195" y="17" width="11" height="27"/>
-      <rect class="bar-recv" x="211" y="10" width="11" height="34"/><rect class="bar-done" x="224" y="15" width="11" height="29"/>
-      <rect class="bar-recv" x="240" y="9" width="11" height="35"/><rect class="bar-done" x="253" y="14" width="11" height="30"/>
-      <rect class="bar-recv" x="269" y="8" width="11" height="36"/><rect class="bar-done" x="282" y="14" width="11" height="30"/>
-      <rect class="bar-recv" x="298" y="7" width="11" height="37"/><rect class="bar-done" x="311" y="12" width="11" height="32"/>
-      <rect class="bar-recv" x="327" y="6" width="11" height="38"/><rect class="bar-done" x="340" y="11" width="11" height="33"/>
-      <text x="20" y="58">T9</text>
-      <text x="49" y="58">T10</text>
-      <text x="78" y="58">T11</text>
-      <text x="107" y="58">T12</text>
-      <text x="136" y="58">T1</text>
-      <text x="165" y="58">T2</text>
-      <text x="194" y="58">T3</text>
-      <text x="223" y="58">T4</text>
-      <text x="252" y="58">T5</text>
-      <text x="281" y="58">T6</text>
-      <text x="310" y="58">T7</text>
-      <text x="346" y="58">T8</text>
-    </svg>
-    <div class="pl-chart-legend">
-      <span class="pl-chart-key"><i style="background:#3769d6;height:8px;border-radius:2px"></i>Câu hỏi tiếp nhận</span>
-      <span class="pl-chart-key"><i style="background:#15936c;height:8px;border-radius:2px"></i>Đã trả lời</span>
-    </div>
-    <div class="pl-chart-recommendation"><strong>Cách đọc:</strong> khoảng cách giữa hai cột mỗi tháng là số câu chưa trả lời; kỳ này còn 335 câu.</div>
-  </section>
-
-  <!-- Lĩnh vực được hỏi nhiều nhất -->
-  <section class="pl-panel pl-content-type">
-    <h4>Lĩnh vực được hỏi nhiều nhất</h4>
-    <div class="pl-sub">Hỏi đáp pháp luật · Top 5 trong 2.460 câu · % so với cùng kỳ</div>
-    <div class="pl-mini-bars">
+<!-- Lĩnh vực được hỏi nhiều nhất -->
+<section class="pl-panel pl-content-type">
+  <h4>Lĩnh vực được hỏi nhiều nhất</h4>
+  <div class="pl-sub">Hỏi đáp pháp luật · Top 5 trong 2.460 câu · % so với cùng kỳ</div>
+  <div class="pl-mini-bars">
       <div class="pl-mini-bar"><span>Đất đai &amp; nhà ở</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:100%"></div></div><strong>592</strong><em class="good" title="So với cùng kỳ">+24,1%</em></div>
       <div class="pl-mini-bar"><span>Hôn nhân &amp; gia đình</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:70.6%"></div></div><strong>418</strong><em class="good" title="So với cùng kỳ">+17,0%</em></div>
       <div class="pl-mini-bar"><span>Lao động &amp; việc làm</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:60.1%"></div></div><strong>356</strong><em class="good" title="So với cùng kỳ">+14,5%</em></div>
       <div class="pl-mini-bar"><span>BHXH &amp; bảo hiểm</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:48.5%"></div></div><strong>287</strong><em class="down" title="So với cùng kỳ">-11,7%</em></div>
       <div class="pl-mini-bar"><span>Giao thông</span><div class="pl-mini-track"><div class="pl-mini-fill" style="width:36.1%"></div></div><strong>214</strong><em class="good" title="So với cùng kỳ">+9,3%</em></div>
     </div>
-    <div class="pl-chart-recommendation"><strong>Cách đọc:</strong> cột phải là tăng/giảm so với cùng kỳ năm trước, không phải tỷ trọng trong 2.460 câu. BHXH đang giảm 11,7% dù vẫn nằm trong top 5.</div>
-  </section>
-</div>
+  <div class="pl-chart-recommendation"><strong>Cách đọc:</strong> cột phải là tăng/giảm so với cùng kỳ năm trước, không phải tỷ trọng trong 2.460 câu. BHXH đang giảm 11,7% dù vẫn nằm trong top 5.</div>
+</section>
 
-<div class="pl-chart-triple">
-  <!-- Top diễn đàn theo thành viên -->
-  <section class="pl-panel pl-content-type">
-    <h4>Top 5 diễn đàn nhiều thành viên nhất</h4>
-    <div class="pl-sub">Diễn đàn · thành viên tham gia từng diễn đàn · % so với cùng kỳ</div>
-    <ol class="pl-topic-list">
-      <li><b>1</b><span>Diễn đàn Đất đai &amp; nhà ở</span><strong>412</strong><em class="good" title="So với cùng kỳ">+28,6%</em></li>
-      <li><b>2</b><span>Diễn đàn Hôn nhân &amp; gia đình</span><strong>356</strong><em class="good" title="So với cùng kỳ">+16,7%</em></li>
-      <li><b>3</b><span>Diễn đàn Lao động &amp; việc làm</span><strong>298</strong><em class="good" title="So với cùng kỳ">+20,0%</em></li>
-      <li><b>4</b><span>Diễn đàn Doanh nghiệp &amp; đầu tư</span><strong>214</strong><em class="good" title="So với cùng kỳ">+33,3%</em></li>
-      <li><b>5</b><span>Diễn đàn Giao thông đường bộ</span><strong>176</strong><em class="down" title="So với cùng kỳ">-25,0%</em></li>
-    </ol>
-  </section>
-
-  <!-- Top dự thảo theo góp ý -->
-  <section class="pl-panel pl-content-type">
-    <h4>Top 5 dự thảo có nhiều góp ý nhất</h4>
-    <div class="pl-sub">Dự thảo đang mở · số góp ý / kiến nghị · % so với cùng kỳ</div>
-    <ol class="pl-topic-list">
-      <li><b>1</b><span>Luật Đất đai (sửa đổi)</span><strong>86</strong><em class="good" title="So với cùng kỳ">+18,2%</em></li>
-      <li><b>2</b><span>NĐ hướng dẫn BHXH</span><strong>64</strong><em class="good" title="So với cùng kỳ">+12,3%</em></li>
-      <li><b>3</b><span>Luật Nhà ở</span><strong>52</strong><em class="down" title="So với cùng kỳ">-6,4%</em></li>
-      <li><b>4</b><span>TT giao thông đường bộ</span><strong>41</strong><em class="good" title="So với cùng kỳ">+24,2%</em></li>
-      <li><b>5</b><span>Luật Doanh nghiệp (sửa đổi)</span><strong>28</strong><em class="good" title="So với cùng kỳ">+7,7%</em></li>
-    </ol>
-  </section>
-
-  <!-- Top lĩnh vực theo hiến kế -->
-  <section class="pl-panel pl-content-type">
-    <h4>Top 5 lĩnh vực có nhiều hiến kế nhất</h4>
-    <div class="pl-sub">Hiến kế · 179 / 211 hiến kế · % so với cùng kỳ</div>
-    <ol class="pl-topic-list">
-      <li><b>1</b><span>Đất đai &amp; nhà ở</span><strong>60</strong><em class="good" title="So với cùng kỳ">+21,4%</em></li>
-      <li><b>2</b><span>Lao động &amp; việc làm</span><strong>44</strong><em class="good" title="So với cùng kỳ">+8,0%</em></li>
-      <li><b>3</b><span>Doanh nghiệp &amp; đầu tư</span><strong>33</strong><em class="good" title="So với cùng kỳ">+15,6%</em></li>
-      <li><b>4</b><span>BHXH &amp; bảo hiểm</span><strong>24</strong><em class="down" title="So với cùng kỳ">-9,2%</em></li>
-      <li><b>5</b><span>Giao thông</span><strong>18</strong><em class="good" title="So với cùng kỳ">+11,1%</em></li>
-    </ol>
-    <div class="pl-chart-recommendation"><strong>Cách đọc:</strong> đất đai vừa bị hỏi nhiều nhất vừa nhận nhiều hiến kế nhất (60). BHXH giảm 9,2% so với cùng kỳ dù vẫn nằm trong top 5.</div>
-  </section>
+<section class="pl-panel pl-content-type" id="pl-ai-panel">
+  <h4 id="pl-ai-title">Xu hướng câu hỏi gửi tới AI · 30 ngày</h4>
+  <div class="pl-sub" id="pl-ai-sub">Bốn trợ lý pháp lý · số câu hỏi theo tuần</div>
+  <svg class="pl-line-chart" id="pl-ai-chart" viewBox="0 0 1200 300" data-x0="72" data-x1="1176" data-top="34" data-base="238" role="img" aria-label="Số câu hỏi gửi tới bốn trợ lý AI theo tuần trong 30 ngày">
+    <line class="chart-grid" x1="72" y1="34" x2="1176" y2="34"/>
+    <line class="chart-grid" x1="72" y1="136" x2="1176" y2="136"/>
+    <line class="chart-grid" x1="72" y1="238" x2="1176" y2="238"/>
+    <text class="axis-y" x="64" y="38">8 nghìn</text>
+    <text class="axis-y" x="64" y="140">4</text>
+    <text class="axis-y" x="64" y="242">0</text>
+    <path class="chart-line"/>
+    <path class="chart-line-2"/>
+    <path class="chart-line-3"/>
+    <path class="chart-line-4"/>
+    <g class="ai-dots"></g>
+  </svg>
+  <div class="pl-chart-legend">
+    <span class="pl-chart-key"><i style="background:#3769d6"></i>AI luật</span>
+    <span class="pl-chart-key"><i style="background:#e59500"></i>AI lexcentra</span>
+    <span class="pl-chart-key"><i style="background:#15936c"></i>C-AI Legal</span>
+    <span class="pl-chart-key"><i style="background:#9966cc"></i>AI BLEGAL</span>
+  </div>
+  <div class="pl-chart-recommendation"><strong>Cách đọc:</strong> AI luật nhận nhiều câu nhất. C-AI Legal tăng mạnh gần cuối kỳ; AI BLEGAL ổn định ở mức thấp hơn. Tên đầy đủ: C-AI Legal — Trợ lý ảo pháp lý thông minh; AI BLEGAL — Trợ lý số pháp lý.</div>
+</section>
 </div>
 
 </div>
@@ -1370,6 +1388,31 @@
     <div class="pl-chart-recommendation"><strong>Cách đọc:</strong> Vụ Pháp luật Dân sự – Kinh tế nhận nhiều câu nhất (480) và cũng chậm nhất (5,8 ngày) — nghẽn nằm ở khối lượng, không phải ở quy trình.</div>
   </section>
 
+  <section class="pl-panel pl-content-type" data-module="qa">
+    <h4 id="pl-ai-tab-title">Xu hướng câu hỏi gửi tới AI · 30 ngày</h4>
+    <div class="pl-sub" id="pl-ai-tab-sub">Bốn trợ lý pháp lý · số câu hỏi theo tuần</div>
+    <svg class="pl-line-chart" id="pl-ai-tab-chart" viewBox="0 0 1200 300" data-x0="72" data-x1="1176" data-top="34" data-base="238" role="img" aria-label="Số câu hỏi gửi tới bốn trợ lý AI theo tuần trong 30 ngày">
+      <line class="chart-grid" x1="72" y1="34" x2="1176" y2="34"/>
+      <line class="chart-grid" x1="72" y1="136" x2="1176" y2="136"/>
+      <line class="chart-grid" x1="72" y1="238" x2="1176" y2="238"/>
+      <text class="axis-y" x="64" y="38">8 nghìn</text>
+      <text class="axis-y" x="64" y="140">4</text>
+      <text class="axis-y" x="64" y="242">0</text>
+      <path class="chart-line"/>
+      <path class="chart-line-2"/>
+      <path class="chart-line-3"/>
+      <path class="chart-line-4"/>
+      <g class="ai-dots"></g>
+    </svg>
+    <div class="pl-chart-legend">
+      <span class="pl-chart-key"><i style="background:#3769d6"></i>AI luật</span>
+      <span class="pl-chart-key"><i style="background:#e59500"></i>AI lexcentra</span>
+      <span class="pl-chart-key"><i style="background:#15936c"></i>C-AI Legal</span>
+      <span class="pl-chart-key"><i style="background:#9966cc"></i>AI BLEGAL</span>
+    </div>
+    <div class="pl-chart-recommendation"><strong>Cách đọc:</strong> AI luật nhận nhiều câu nhất. C-AI Legal tăng mạnh gần cuối kỳ; AI BLEGAL ổn định ở mức thấp hơn. Tên đầy đủ: C-AI Legal — Trợ lý ảo pháp lý thông minh; AI BLEGAL — Trợ lý số pháp lý.</div>
+  </section>
+
   <!-- PBGDPL: lĩnh vực hỏi đáp (CMS-703) -->
   <section class="pl-panel pl-content-type pl-chart-half" data-module="pbgdpl">
     <h4>Lĩnh vực hỏi đáp PBGDPL</h4>
@@ -1528,6 +1571,42 @@
       </div>
     </div>
     <div class="pl-chart-recommendation"><strong>Cách đọc:</strong> hơn một nửa bài CTV (218) còn nằm ở khâu biên tập — đây là nơi cần thêm người duyệt nếu muốn tăng tỷ trọng CTV.</div>
+  </section>
+
+  <!-- Tin tức: xu hướng theo lĩnh vực -->
+  <section class="pl-panel pl-content-type" data-module="news">
+    <div class="pl-panel-head">
+      <div>
+        <h4 id="pl-news-tab-title">Xu hướng tin tức theo lĩnh vực · 30 ngày</h4>
+        <div class="pl-sub" id="pl-news-tab-sub">Top 5 lĩnh vực phổ biến nhất · lượt xem theo tuần</div>
+      </div>
+      <div class="pl-toggle" id="pl-news-tab-toggle" role="group" aria-label="Chỉ số tin tức theo lĩnh vực">
+        <button type="button" data-metric="views" aria-pressed="true">Lượt xem</button>
+        <button type="button" data-metric="comments" aria-pressed="false">Bình luận</button>
+      </div>
+    </div>
+    <svg class="pl-line-chart" id="pl-news-tab-chart" viewBox="0 0 1200 300" data-x0="72" data-x1="1176" data-top="34" data-base="238" role="img" aria-label="Biểu đồ đường lượt xem tin tức của năm lĩnh vực pháp luật">
+      <line class="chart-grid" x1="72" y1="34" x2="1176" y2="34"/>
+      <line class="chart-grid" x1="72" y1="136" x2="1176" y2="136"/>
+      <line class="chart-grid" x1="72" y1="238" x2="1176" y2="238"/>
+      <text class="axis-y" x="64" y="38">14 nghìn</text>
+      <text class="axis-y" x="64" y="140">7</text>
+      <text class="axis-y" x="64" y="242">0</text>
+      <path class="chart-line"/>
+      <path class="chart-line-2"/>
+      <path class="chart-line-3"/>
+      <path class="chart-line-4"/>
+      <path class="chart-line-5"/>
+      <g class="news-dots"></g>
+    </svg>
+    <div class="pl-chart-legend">
+      <span class="pl-chart-key"><i style="background:#3769d6"></i>Đất đai &amp; nhà ở</span>
+      <span class="pl-chart-key"><i style="background:#e59500"></i>Hôn nhân &amp; gia đình</span>
+      <span class="pl-chart-key"><i style="background:#15936c"></i>Lao động &amp; việc làm</span>
+      <span class="pl-chart-key"><i style="background:#9966cc"></i>Giao thông</span>
+      <span class="pl-chart-key"><i style="background:#7d8da8"></i>BHXH &amp; bảo hiểm</span>
+    </div>
+    <div class="pl-chart-recommendation" id="pl-news-tab-note"><strong>Cách đọc:</strong> đất đai dẫn đầu lượt xem; tab Bình luận cho thấy lao động vượt hôn nhân.</div>
   </section>
 
   <!-- Diễn đàn: chủ đề theo trạng thái -->
@@ -1970,7 +2049,17 @@
       done: [22, 27],
       chartScale: ['950','475'],
       commentScale: ['32','16'],
-      barScale: .035
+      barScale: .035,
+      trafficScale: ['80 nghìn','53 nghìn','27 nghìn'],
+      visits: [.68, .76],
+      users: [.22, .24],
+      aiScale: ['180','90'],
+      ai: [
+        [.72, .86],
+        [.48, .41],
+        [.38, .62],
+        [.22, .28]
+      ]
     },
     week: {
       label: '7 ngày',
@@ -1989,7 +2078,17 @@
       done: [18, 20, 17, 23, 21, 24, 27],
       chartScale: ['5,4 nghìn','2,7'],
       commentScale: ['140','70'],
-      barScale: .24
+      barScale: .24,
+      trafficScale: ['180 nghìn','120 nghìn','60 nghìn'],
+      visits: [.52, .58, .49, .71, .64, .78, .61],
+      users: [.18, .19, .17, .21, .20, .22, .19],
+      aiScale: ['2,4 nghìn','1,2'],
+      ai: [
+        [.58, .71, .52, .78, .64, .88, .61],
+        [.42, .38, .55, .47, .62, .44, .51],
+        [.31, .48, .36, .58, .41, .72, .54],
+        [.18, .24, .16, .28, .22, .31, .26]
+      ]
     },
     month: {
       label: '30 ngày',
@@ -2008,7 +2107,18 @@
       done: [19, 23, 26, 31],
       chartScale: ['14 nghìn','7'],
       commentScale: ['320','160'],
-      barScale: 1
+      barScale: 1,
+      trafficAxis: ['Tuần 1','Tuần 2','Tuần 3','Tuần 4','Gần nhất'],
+      trafficScale: ['1,0 triệu','660 nghìn','330 nghìn'],
+      visits: [.66, .72, .80, .92, .42],
+      users: [.09, .10, .12, .128, .08],
+      aiScale: ['8 nghìn','4'],
+      ai: [
+        [.62, .78, .55, .91],
+        [.48, .41, .68, .52],
+        [.35, .58, .42, .74],
+        [.22, .18, .34, .27]
+      ]
     },
     year: {
       label: '12 tháng',
@@ -2027,7 +2137,17 @@
       done: [20,21,23,23,25,26,27,29,30,30,32,33],
       chartScale: ['138 nghìn','69'],
       commentScale: ['4,1 nghìn','2,05'],
-      barScale: 10.8
+      barScale: 10.8,
+      trafficScale: ['4,2 triệu','2,8 triệu','1,4 triệu'],
+      visits: [.52, .55, .58, .62, .64, .61, .68, .72, .76, .81, .88, .74],
+      users: [.22, .23, .24, .25, .26, .26, .27, .28, .29, .30, .31, .31],
+      aiScale: ['42 nghìn','21'],
+      ai: [
+        [.48, .52, .46, .61, .55, .72, .58, .68, .74, .62, .88, .71],
+        [.32, .38, .34, .42, .48, .41, .55, .47, .52, .61, .54, .58],
+        [.22, .28, .31, .26, .42, .38, .51, .46, .58, .52, .71, .64],
+        [.14, .16, .18, .15, .22, .19, .24, .21, .28, .26, .31, .29]
+      ]
     }
   };
 
@@ -2069,47 +2189,198 @@
   // giãn của năm lĩnh vực, nên chỉ cần vẽ lại thay vì dựng hai biểu đồ.
   const newsChart = document.getElementById('pl-news-chart');
   const newsToggle = document.getElementById('pl-news-toggle');
+  const newsTabChart = document.getElementById('pl-news-tab-chart');
+  const newsTabToggle = document.getElementById('pl-news-tab-toggle');
   const newsMetrics = {
     views: { name: 'Lượt xem', unit: 'lượt xem', lifts: [0, 1, 2, 3, 4], scale: 'chartScale' },
     comments: { name: 'Bình luận', unit: 'số bình luận', lifts: [0, 2, 1, 4, 3], scale: 'commentScale' }
   };
   let newsMetric = 'views';
+  let newsTabMetric = 'views';
 
-  const drawNewsChart = data => {
-    const metric = newsMetrics[newsMetric];
+  // Chấm tròn và nét vẽ dùng cùng thứ tự màu, nên một mảng lớp là đủ cho mọi
+  // biểu đồ đường nhiều chuỗi.
+  const chartDotClass = ['chart-dot', 'chart-dot-2', 'chart-dot-3', 'chart-dot-4', 'chart-dot-5'];
+
+  // Mỗi lĩnh vực có nhịp tăng giảm riêng: dao động tuần hoàn theo chỉ số đường
+  // và vị trí điểm để năm đường không song song thẳng như nhau.
+  const newsWobble = (lineIndex, point, metricKey) => {
+    const phase = lineIndex * 2.3 + (metricKey === 'comments' ? 1.1 : 0);
+    return Math.sin(point * (1.5 + lineIndex * .45) + phase) * .07;
+  };
+
+  const drawNewsTrend = (chart, titleId, subId, metricKey, data) => {
+    const metric = newsMetrics[metricKey];
     const n = data.axis.length;
-    const x0 = Number(newsChart.dataset.x0);
-    const x1 = Number(newsChart.dataset.x1);
-    const top = Number(newsChart.dataset.top);
-    const base = Number(newsChart.dataset.base);
+    const x0 = Number(chart.dataset.x0);
+    const x1 = Number(chart.dataset.x1);
+    const top = Number(chart.dataset.top);
+    const base = Number(chart.dataset.base);
     const xs = spread(n, x0, x1);
-    const lines = newsChart.querySelectorAll('path');
+    const lines = chart.querySelectorAll('path');
+
+    const dots = chart.querySelector('.news-dots');
+    dots.replaceChildren();
 
     lines.forEach((line, lineIndex) => {
       const lift = metric.lifts[lineIndex];
       const ys = data.line.map((value, point) => {
-        const height = (36 - value) / 36 * (1 - lift * .15) + ((point + lift) % 3) * .012;
-        return base - Math.max(.04, Math.min(1, height)) * (base - top);
+        const height = (36 - value) / 36 * (1 - lift * .15) + newsWobble(lineIndex, point, metricKey);
+        return base - Math.max(.04, Math.min(.98, height)) * (base - top);
       });
       line.setAttribute('d', ys.map((y, point) => `${point ? 'L' : 'M'}${xs[point]} ${y.toFixed(1)}`).join(' '));
+      ys.forEach((y, point) => dots.appendChild(ns('circle', {
+        class: chartDotClass[lineIndex],
+        cx: xs[point],
+        cy: y.toFixed(1),
+        r: 5
+      })));
     });
 
-    newsChart.querySelectorAll('.axis-x').forEach(label => label.remove());
-    data.axis.forEach((tick, i) => newsChart.appendChild(ns('text', { class: 'axis-x', x: xs[i], y: base + 30 }, tick)));
+    chart.querySelectorAll('.axis-x').forEach(label => label.remove());
+    data.axis.forEach((tick, i) => chart.appendChild(ns('text', { class: 'axis-x', x: xs[i], y: base + 30 }, tick)));
 
     const scale = data[metric.scale];
-    const yLabels = newsChart.querySelectorAll('.axis-y');
+    const yLabels = chart.querySelectorAll('.axis-y');
     yLabels[0].textContent = scale[0];
     yLabels[1].textContent = scale[1];
 
-    const dot = newsChart.querySelector('.chart-dot');
-    const last = lines[0].getAttribute('d').match(/[\d.]+$/);
-    dot.setAttribute('cx', xs[n - 1]);
-    if (last) dot.setAttribute('cy', last[0]);
+    chart.setAttribute('aria-label', `Biểu đồ đường ${metric.unit} tin tức của năm lĩnh vực pháp luật, ${data.grain}, kỳ ${data.label}`);
+    document.getElementById(titleId).textContent = `Xu hướng tin tức theo lĩnh vực · ${data.label}`;
+    document.getElementById(subId).textContent = `Top 5 lĩnh vực phổ biến nhất · ${metric.unit} ${data.grain}`;
+  };
 
-    newsChart.setAttribute('aria-label', `Biểu đồ đường ${metric.unit} tin tức của năm lĩnh vực pháp luật, ${data.grain}, kỳ ${data.label}`);
-    document.getElementById('pl-news-title').textContent = `Xu hướng tin tức theo lĩnh vực · ${data.label}`;
-    document.getElementById('pl-news-sub').textContent = `Top 5 lĩnh vực phổ biến nhất · ${metric.unit} ${data.grain}`;
+  const drawNewsChart = data => {
+    drawNewsTrend(newsChart, 'pl-news-title', 'pl-news-sub', newsMetric, data);
+    drawNewsTrend(newsTabChart, 'pl-news-tab-title', 'pl-news-tab-sub', newsTabMetric, data);
+  };
+
+  const trafficChart = document.getElementById('pl-traffic-chart');
+
+  const drawTrafficChart = data => {
+    const axis = data.trafficAxis || data.axis;
+    const n = axis.length;
+    const x0 = Number(trafficChart.dataset.x0);
+    const x1 = Number(trafficChart.dataset.x1);
+    const top = Number(trafficChart.dataset.top);
+    const base = Number(trafficChart.dataset.base);
+    const xs = spread(n, x0, x1);
+    const toY = share => base - share * (base - top);
+    const pathOf = values => values.map((share, i) => `${i ? 'L' : 'M'}${xs[i]} ${toY(share).toFixed(1)}`).join(' ');
+
+    const paths = trafficChart.querySelectorAll('path');
+    paths[0].setAttribute('d', pathOf(data.visits));
+    paths[1].setAttribute('d', pathOf(data.users));
+
+    trafficChart.querySelectorAll('.axis-x').forEach(label => label.remove());
+    axis.forEach((tick, i) => trafficChart.appendChild(ns('text', { class: 'axis-x', x: xs[i], y: base + 30 }, tick)));
+
+    const yLabels = trafficChart.querySelectorAll('.axis-y');
+    yLabels[0].textContent = data.trafficScale[0];
+    yLabels[1].textContent = data.trafficScale[1];
+    yLabels[2].textContent = data.trafficScale[2];
+
+    const dots = trafficChart.querySelector('.traffic-dots');
+    dots.replaceChildren();
+    data.visits.forEach((share, i) => dots.appendChild(ns('circle', { class: 'chart-dot', cx: xs[i], cy: toY(share).toFixed(1), r: 5 })));
+    data.users.forEach((share, i) => dots.appendChild(ns('circle', { class: 'chart-dot-user', cx: xs[i], cy: toY(share).toFixed(1), r: 5 })));
+
+    document.getElementById('pl-traffic-title').textContent = `Biểu đồ Người dùng cổng & Lượt truy cập · ${data.label}`;
+    document.getElementById('pl-traffic-sub').textContent = `Thống kê 2 chỉ số ${data.grain} · lượt / người`;
+    trafficChart.setAttribute('aria-label', `Lượt truy cập và số người dùng cổng ${data.grain}, kỳ ${data.label}`);
+  };
+
+  const drawAiTrend = (chart, titleId, subId, data) => {
+    const n = data.axis.length;
+    const x0 = Number(chart.dataset.x0);
+    const x1 = Number(chart.dataset.x1);
+    const top = Number(chart.dataset.top);
+    const base = Number(chart.dataset.base);
+    const xs = spread(n, x0, x1);
+    const toY = share => base - share * (base - top);
+    const paths = chart.querySelectorAll('path');
+    const dots = chart.querySelector('.ai-dots');
+    dots.replaceChildren();
+
+    data.ai.forEach((series, lineIndex) => {
+      const ys = series.map(toY);
+      paths[lineIndex].setAttribute('d', ys.map((y, i) => `${i ? 'L' : 'M'}${xs[i]} ${y.toFixed(1)}`).join(' '));
+      ys.forEach((y, i) => dots.appendChild(ns('circle', {
+        class: chartDotClass[lineIndex],
+        cx: xs[i],
+        cy: y.toFixed(1),
+        r: 5
+      })));
+    });
+
+    chart.querySelectorAll('.axis-x').forEach(label => label.remove());
+    data.axis.forEach((tick, i) => chart.appendChild(ns('text', { class: 'axis-x', x: xs[i], y: base + 30 }, tick)));
+
+    const yLabels = chart.querySelectorAll('.axis-y');
+    yLabels[0].textContent = data.aiScale[0];
+    yLabels[1].textContent = data.aiScale[1];
+
+    chart.setAttribute('aria-label', `Số câu hỏi gửi tới bốn trợ lý AI ${data.grain}, kỳ ${data.label}`);
+    document.getElementById(titleId).textContent = `Xu hướng câu hỏi gửi tới AI · ${data.label}`;
+    document.getElementById(subId).textContent = `Bốn trợ lý pháp lý · số câu hỏi ${data.grain}`;
+  };
+
+  const drawAiChart = data => {
+    drawAiTrend(document.getElementById('pl-ai-chart'), 'pl-ai-title', 'pl-ai-sub', data);
+    drawAiTrend(document.getElementById('pl-ai-tab-chart'), 'pl-ai-tab-title', 'pl-ai-tab-sub', data);
+  };
+
+  const parseCount = value => Number(String(value).replace(/\./g, '')) || 0;
+
+  const splitCounts = (weights, total) => {
+    const sum = weights.reduce((acc, value) => acc + value, 0) || 1;
+    const raw = weights.map(value => Math.round(total * value / sum));
+    raw[raw.length - 1] += total - raw.reduce((acc, value) => acc + value, 0);
+    return raw.map(value => Math.max(0, value));
+  };
+
+  const drawQaButterfly = data => {
+    const svg = document.getElementById('pl-qa-butterfly');
+    const plot = svg.querySelector('.qa-plot');
+    const n = data.axis.length;
+    const x0 = 84;
+    const x1 = 616;
+    const mid = 128;
+    const maxH = 92;
+    const slot = (x1 - x0) / n;
+    const barW = n <= 2 ? 46 : n <= 4 ? 36 : n <= 7 ? 26 : 18;
+    const valSize = n > 7 ? 8 : 10;
+    const recvCount = splitCounts(data.recv, parseCount(data.qa[0]));
+    const doneCount = splitCounts(data.done, parseCount(data.qa[1]));
+    const peak = Math.max(...recvCount, ...doneCount, 1);
+    const yLabels = svg.querySelectorAll('.axis-y');
+    const topLabel = peak >= 1000 ? `${(peak / 1000).toFixed(peak >= 10000 ? 0 : 1).replace('.', ',')} nghìn` : String(peak);
+    const midLabel = peak >= 1000 ? `${(peak / 2000).toFixed(1).replace('.', ',')}` : String(Math.round(peak / 2));
+    yLabels[0].textContent = topLabel;
+    yLabels[1].textContent = midLabel;
+    yLabels[3].textContent = midLabel;
+    yLabels[4].textContent = topLabel;
+
+    plot.replaceChildren();
+    const tops = [];
+    recvCount.forEach((count, i) => {
+      const cx = x0 + slot * i + slot / 2;
+      const x = cx - barW / 2;
+      const nowH = Math.max(8, count / peak * maxH);
+      const thenH = Math.max(8, doneCount[i] / peak * maxH);
+      tops.push({ cx, y: mid - nowH });
+      plot.appendChild(ns('rect', { class: 'bar-now', x, y: mid - nowH, width: barW, height: nowH, rx: 2 }));
+      plot.appendChild(ns('rect', { class: 'bar-then', x, y: mid, width: barW, height: thenH, rx: 2 }));
+      plot.appendChild(ns('text', { class: 'val-now', x: cx, y: mid - 8, style: `font-size:${valSize}px` }, count.toLocaleString('vi-VN')));
+      plot.appendChild(ns('text', { class: 'val-then', x: cx, y: mid + 16, style: `font-size:${valSize}px` }, doneCount[i].toLocaleString('vi-VN')));
+      plot.appendChild(ns('text', { class: 'axis-x', x: cx, y: 258 }, data.axis[i]));
+    });
+    plot.appendChild(ns('path', { class: 'trend', d: tops.map((point, i) => `${i ? 'L' : 'M'}${point.cx} ${point.y}`).join(' ') }));
+    tops.forEach(point => plot.appendChild(ns('circle', { class: 'trend-dot', cx: point.cx, cy: point.y, r: 4 })));
+
+    document.getElementById('pl-qa-title').textContent = `Câu hỏi tiếp nhận và đã trả lời · ${data.label}`;
+    document.getElementById('pl-qa-sub').textContent = `Hỏi đáp pháp luật · ${data.grain} · tỷ lệ trả lời kỳ này ${data.qa[2]} (${data.qa[1]} / ${data.qa[0]}) · ${data.compare} ${data.qa[3]}`;
+    svg.setAttribute('aria-label', `Cột đối xứng ${data.grain}: phía trên là câu hỏi tiếp nhận, phía dưới là câu đã trả lời, kỳ ${data.label}`);
   };
 
   const updatePeriod = key => {
@@ -2144,21 +2415,9 @@
     });
 
     drawNewsChart(data);
-
-    const barSvg = overviewPanel.querySelector('.pl-kpi-bars');
-    barSvg.querySelectorAll('rect, text').forEach(el => el.remove());
-    const slot = 348 / n;
-    const barW = n <= 2 ? 22 : n <= 4 ? 16 : n <= 7 ? 12 : 11;
-    data.recv.forEach((height, i) => {
-      const x = 8 + i * slot + (slot - barW * 2 - 2) / 2;
-      const doneH = data.done[i];
-      barSvg.appendChild(ns('rect', { class: 'bar-recv', x, y: 44 - height, width: barW, height }));
-      barSvg.appendChild(ns('rect', { class: 'bar-done', x: x + barW + 2, y: 44 - doneH, width: barW, height: doneH }));
-      barSvg.appendChild(ns('text', { x: x + barW, y: 58 }, data.axis[i]));
-    });
-    const qaPanel = barSvg.closest('section');
-    qaPanel.querySelector('h4').textContent = `Câu hỏi tiếp nhận và đã trả lời · ${data.label}`;
-    qaPanel.querySelector('.pl-sub').textContent = `Hỏi đáp pháp luật · ${data.grain} · tỷ lệ trả lời kỳ này ${data.qa[2]} (${data.qa[1]} / ${data.qa[0]}) · ${data.compare} ${data.qa[3]}`;
+    drawTrafficChart(data);
+    drawAiChart(data);
+    drawQaButterfly(data);
     const fieldPanel = [...overviewPanel.querySelectorAll('.pl-content-type')].find(panel => panel.querySelector('h4')?.textContent === 'Lĩnh vực được hỏi nhiều nhất');
     if (fieldPanel) fieldPanel.querySelector('.pl-sub').textContent = `Hỏi đáp pháp luật · Top 5 trong ${data.qa[0]} câu · % so với ${data.compare}`;
 
@@ -2184,7 +2443,13 @@
   newsToggle.querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
     newsToggle.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
     newsMetric = btn.dataset.metric;
-    drawNewsChart(periodData[currentPeriod]);
+    drawNewsTrend(newsChart, 'pl-news-title', 'pl-news-sub', newsMetric, periodData[currentPeriod]);
+  }));
+
+  newsTabToggle.querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
+    newsTabToggle.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+    newsTabMetric = btn.dataset.metric;
+    drawNewsTrend(newsTabChart, 'pl-news-tab-title', 'pl-news-tab-sub', newsTabMetric, periodData[currentPeriod]);
   }));
 
   const bindRankToggle = (toggleId, listId, titleId, subId, sets, initial) => {
